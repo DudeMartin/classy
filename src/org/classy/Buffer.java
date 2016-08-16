@@ -41,4 +41,11 @@ class Buffer {
         }
         return new String(decoded, 0, index);
     }
+
+    byte[] getBytes(int amount) {
+        byte[] bytes = new byte[amount];
+        System.arraycopy(buffer, offset, bytes, 0, amount);
+        offset += amount;
+        return bytes;
+    }
 }

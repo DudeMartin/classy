@@ -7,12 +7,12 @@ public class NullaryInstruction extends Instruction {
     }
 
     protected boolean isValid(int opcode) {
-        return opcode < Instruction.BIPUSH
-                || (opcode > Instruction.ALOAD && opcode < Instruction.ISTORE)
-                || (opcode > Instruction.ASTORE && opcode < Instruction.IINC)
-                || (opcode > Instruction.IINC && opcode < Instruction.IFEQ)
-                || (opcode > Instruction.LOOKUPSWITCH && opcode < Instruction.GETSTATIC)
-                || (opcode > Instruction.ANEWARRAY && opcode < Instruction.CHECKCAST)
-                || (opcode > Instruction.INSTANCEOF && opcode < Instruction.WIDE);
+        return opcode < BIPUSH
+                || (opcode > ALOAD && opcode < ISTORE)
+                || (opcode > ASTORE && opcode < IINC)
+                || (opcode > IINC && opcode < IFEQ)
+                || (opcode > LOOKUPSWITCH && opcode < GETSTATIC)
+                || (opcode > ANEWARRAY && opcode < CHECKCAST)
+                || (opcode > INSTANCEOF && opcode < WIDE);
     }
 }

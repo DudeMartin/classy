@@ -1,5 +1,6 @@
 package org.classy;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class FieldMember extends ClassMember {
@@ -37,7 +38,10 @@ public class FieldMember extends ClassMember {
                     break;
             }
         } else {
-            data.offset += length;
+            if (customAttributes == null) {
+                customAttributes = new ArrayList<CustomAttribute>(1);
+            }
+            customAttributes.add(new CustomAttribute(data, name, length));
         }
     }
 }

@@ -28,6 +28,7 @@ public class ClassFile {
     public List<AnnotationMember> invisibleAnnotations;
     public List<TypeAnnotationMember> visibleTypeAnnotations;
     public List<TypeAnnotationMember> invisibleTypeAnnotations;
+    public List<CustomAttribute> customAttributes;
 
     public ClassFile() {
 
@@ -108,7 +109,10 @@ public class ClassFile {
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
                 invisibleTypeAnnotations = SharedAttributes.readTypeAnnotations(constantPool, data);
             } else {
-                data.offset += length;
+                if (customAttributes == null) {
+                    customAttributes = new ArrayList<CustomAttribute>(1);
+                }
+                customAttributes.add(new CustomAttribute(data, attributeName, length));
             }
         }
     }

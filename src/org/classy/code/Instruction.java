@@ -219,7 +219,7 @@ public abstract class Instruction {
 
     public final void setOpcode(int opcode) {
         if (opcode < 0 || opcode >= BREAKPOINT || !isValid(opcode)) {
-            throw new IllegalArgumentException(opcode + " is not a valid opcode for this instruction type.");
+            throw new IllegalArgumentException(opcode + " is not a valid opcode for this instruction descriptor.");
         }
         this.opcode = opcode;
     }

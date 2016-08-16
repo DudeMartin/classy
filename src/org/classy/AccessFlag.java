@@ -95,9 +95,23 @@ public enum AccessFlag {
     }
 
     public static EnumSet<AccessFlag> set(AccessFlag... flags) {
-        if (flags.length == 0) {
-            return EnumSet.noneOf(AccessFlag.class);
+        switch (flags.length) {
+            case 0:
+                return EnumSet.noneOf(AccessFlag.class);
+            case 1:
+                return EnumSet.of(flags[0]);
+            case 2:
+                return EnumSet.of(flags[0], flags[1]);
+            case 3:
+                return EnumSet.of(flags[0], flags[1], flags[2]);
+            case 4:
+                return EnumSet.of(flags[0], flags[1], flags[2], flags[3]);
+            default:
+                EnumSet<AccessFlag> set = EnumSet.noneOf(AccessFlag.class);
+                for (AccessFlag flag : flags) {
+                    set.add(flag);
+                }
+                return set;
         }
-        return EnumSet.of(flags[0], flags);
     }
 }

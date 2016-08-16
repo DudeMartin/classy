@@ -14,6 +14,7 @@ public abstract class ClassMember {
     public List<AnnotationMember> invisibleAnnotations;
     public List<TypeAnnotationMember> visibleTypeAnnotations;
     public List<TypeAnnotationMember> invisibleTypeAnnotations;
+    public List<CustomAttribute> customAttributes;
 
     protected ClassMember() {
 

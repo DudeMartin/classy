@@ -55,7 +55,10 @@ public class MethodMember extends ClassMember {
                 parameters.add(new ParameterMember(constantPool, data));
             }
         } else {
-            data.offset += length;
+            if (customAttributes == null) {
+                customAttributes = new ArrayList<CustomAttribute>(1);
+            }
+            customAttributes.add(new CustomAttribute(data, name, length));
         }
     }
 }
