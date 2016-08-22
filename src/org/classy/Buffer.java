@@ -10,8 +10,12 @@ class Buffer {
         this.offset = offset;
     }
 
+    int getByte() {
+        return buffer[offset++];
+    }
+
     int getUnsignedByte() {
-        return buffer[offset++] & 0xFF;
+        return getByte() & 0xFF;
     }
 
     int getUnsignedShort() {

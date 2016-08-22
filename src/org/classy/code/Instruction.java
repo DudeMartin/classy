@@ -1,5 +1,12 @@
 package org.classy.code;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Arrays.fill;
+import static org.classy.code.Instruction.InstructionType.*;
+
 public abstract class Instruction {
 
     /*
@@ -211,15 +218,75 @@ public abstract class Instruction {
     public static final int IMPDEP1         = 0xFE;
     public static final int IMPDEP2         = 0xFF;
 
+    /**
+     * Represents an instruction type.
+     *
+     * @author Martin Tuskevicius
+     */
+    public enum InstructionType {
+
+        NULLARY,
+        PUSH,
+        CONSTANT_PUSH,
+        VARIABLE,
+        INCREMENT,
+        JUMP,
+        TABLE_SWITCH,
+        LOOKUP_SWITCH,
+        FIELD,
+        METHOD,
+        DYNAMIC_METHOD,
+        TYPE,
+        MULTIDIMENSIONAL_ARRAY,
+        RESERVED
+    }
+
+    /**
+     * The immutable list of instruction types. This list effectively maps the
+     * corresponding type for each instruction opcode. In other words, the type
+     * of instruction for a given opcode can be determined by retrieving the
+     * element at the opcode's index from this list.
+     */
+    public static final List<InstructionType> TYPES;
+
+    static {
+        InstructionType[] array = new InstructionType[IMPDEP2 + 1];
+        fill(array, 0, BIPUSH, NULLARY);
+        fill(array, BIPUSH, LDC, PUSH);
+        fill(array, LDC, ILOAD, CONSTANT_PUSH);
+        fill(array, ILOAD, ILOAD_0, VARIABLE);
+        fill(array, ILOAD_0, ISTORE, NULLARY);
+        fill(array, ISTORE, ISTORE_0, VARIABLE);
+        fill(array, ISTORE_0, IINC, NULLARY);
+        array[IINC] = INCREMENT;
+        fill(array, I2L, IFEQ, NULLARY);
+        fill(array, IFEQ, RET, JUMP);
+        array[RET] = VARIABLE;
+        array[TABLESWITCH] = TABLE_SWITCH;
+        array[LOOKUPSWITCH] = LOOKUP_SWITCH;
+        fill(array, IRETURN, GETSTATIC, NULLARY);
+        fill(array, GETSTATIC, INVOKEVIRTUAL, FIELD);
+        fill(array, INVOKEVIRTUAL, INVOKEDYNAMIC, METHOD);
+        array[INVOKEDYNAMIC] = DYNAMIC_METHOD;
+        fill(array, NEW, ARRAYLENGTH, TYPE);
+        fill(array, ARRAYLENGTH, CHECKCAST, NULLARY);
+        fill(array, CHECKCAST, MONITORENTER, TYPE);
+        fill(array, MONITORENTER, MULTIANEWARRAY, NULLARY);
+        array[MULTIANEWARRAY] = MULTIDIMENSIONAL_ARRAY;
+        fill(array, IFNULL, BREAKPOINT, JUMP);
+        fill(array, BREAKPOINT, array.length, RESERVED);
+        TYPES = Collections.unmodifiableList(Arrays.asList(array));
+    }
+
     private int opcode;
 
-    public Instruction(int opcode) {
+    protected Instruction(int opcode) {
         setOpcode(opcode);
     }
 
     public final void setOpcode(int opcode) {
-        if (opcode < 0 || opcode >= BREAKPOINT || !isValid(opcode)) {
-            throw new IllegalArgumentException(opcode + " is not a valid opcode for this instruction descriptor.");
+        if (TYPES.get(opcode) != getType()) {
+            throw new IllegalArgumentException(opcode + " is not a valid opcode for this instruction type.");
         }
         this.opcode = opcode;
     }
@@ -228,5 +295,5 @@ public abstract class Instruction {
         return opcode;
     }
 
-    protected abstract boolean isValid(int opcode);
+    public abstract InstructionType getType();
 }

@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class MethodMember extends ClassMember {
 
+    public int maxStack;
+    public int maxLocals;
     public List<String> exceptions;
     public List<AnnotationMember>[] visibleParameterAnnotations;
     public List<AnnotationMember>[] invisibleParameterAnnotations;
@@ -59,6 +61,16 @@ public class MethodMember extends ClassMember {
                 customAttributes = new ArrayList<CustomAttribute>(1);
             }
             customAttributes.add(new CustomAttribute(data, name, length));
+        }
+    }
+
+    private void readCodeAttribute(PoolItem[] constantPool, Buffer data) {
+        maxStack = data.getUnsignedShort();
+        maxLocals = data.getUnsignedShort();
+        final int codeStart = data.offset;
+        final int codeEnd = codeStart + data.getInteger();
+        while (data.offset < codeEnd) {
+
         }
     }
 }
