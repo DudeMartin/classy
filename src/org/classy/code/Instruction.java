@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.Arrays.fill;
 import static org.classy.code.Instruction.InstructionType.*;
 
 public abstract class Instruction {
@@ -218,11 +217,6 @@ public abstract class Instruction {
     public static final int IMPDEP1         = 0xFE;
     public static final int IMPDEP2         = 0xFF;
 
-    /**
-     * Represents an instruction type.
-     *
-     * @author Martin Tuskevicius
-     */
     public enum InstructionType {
 
         NULLARY,
@@ -237,46 +231,269 @@ public abstract class Instruction {
         METHOD,
         DYNAMIC_METHOD,
         TYPE,
+        WIDE,
         MULTIDIMENSIONAL_ARRAY,
         RESERVED
     }
 
-    /**
-     * The immutable list of instruction types. This list effectively maps the
-     * corresponding type for each instruction opcode. In other words, the type
-     * of instruction for a given opcode can be determined by retrieving the
-     * element at the opcode's index from this list.
-     */
-    public static final List<InstructionType> TYPES;
-
-    static {
-        InstructionType[] array = new InstructionType[IMPDEP2 + 1];
-        fill(array, 0, BIPUSH, NULLARY);
-        fill(array, BIPUSH, LDC, PUSH);
-        fill(array, LDC, ILOAD, CONSTANT_PUSH);
-        fill(array, ILOAD, ILOAD_0, VARIABLE);
-        fill(array, ILOAD_0, ISTORE, NULLARY);
-        fill(array, ISTORE, ISTORE_0, VARIABLE);
-        fill(array, ISTORE_0, IINC, NULLARY);
-        array[IINC] = INCREMENT;
-        fill(array, I2L, IFEQ, NULLARY);
-        fill(array, IFEQ, RET, JUMP);
-        array[RET] = VARIABLE;
-        array[TABLESWITCH] = TABLE_SWITCH;
-        array[LOOKUPSWITCH] = LOOKUP_SWITCH;
-        fill(array, IRETURN, GETSTATIC, NULLARY);
-        fill(array, GETSTATIC, INVOKEVIRTUAL, FIELD);
-        fill(array, INVOKEVIRTUAL, INVOKEDYNAMIC, METHOD);
-        array[INVOKEDYNAMIC] = DYNAMIC_METHOD;
-        fill(array, NEW, ARRAYLENGTH, TYPE);
-        fill(array, ARRAYLENGTH, CHECKCAST, NULLARY);
-        fill(array, CHECKCAST, MONITORENTER, TYPE);
-        fill(array, MONITORENTER, MULTIANEWARRAY, NULLARY);
-        array[MULTIANEWARRAY] = MULTIDIMENSIONAL_ARRAY;
-        fill(array, IFNULL, BREAKPOINT, JUMP);
-        fill(array, BREAKPOINT, array.length, RESERVED);
-        TYPES = Collections.unmodifiableList(Arrays.asList(array));
-    }
+    public static final List<InstructionType> TYPES = Collections.unmodifiableList(Arrays.asList(
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            PUSH,
+            PUSH,
+            CONSTANT_PUSH,
+            CONSTANT_PUSH,
+            CONSTANT_PUSH,
+            VARIABLE,
+            VARIABLE,
+            VARIABLE,
+            VARIABLE,
+            VARIABLE,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            VARIABLE,
+            VARIABLE,
+            VARIABLE,
+            VARIABLE,
+            VARIABLE,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            INCREMENT,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            VARIABLE,
+            TABLE_SWITCH,
+            LOOKUP_SWITCH,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            NULLARY,
+            FIELD,
+            FIELD,
+            FIELD,
+            FIELD,
+            METHOD,
+            METHOD,
+            METHOD,
+            METHOD,
+            DYNAMIC_METHOD,
+            TYPE,
+            TYPE,
+            TYPE,
+            NULLARY,
+            NULLARY,
+            TYPE,
+            TYPE,
+            NULLARY,
+            NULLARY,
+            InstructionType.WIDE,
+            MULTIDIMENSIONAL_ARRAY,
+            JUMP,
+            JUMP,
+            JUMP,
+            JUMP,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED,
+            RESERVED
+    ));
 
     private int opcode;
 

@@ -38,7 +38,6 @@ public final class PoolItem {
     public final long longValue;
     public final double doubleValue;
     public final String stringValue;
-    private int hash;
 
     PoolItem(Buffer data) {
         tag = data.getUnsignedByte();
@@ -90,35 +89,5 @@ public final class PoolItem {
         this.longValue = longValue;
         this.doubleValue = doubleValue;
         this.stringValue = stringValue;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        } else if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        PoolItem other = (PoolItem) o;
-        return tag == other.tag
-                && value == other.value
-                && longValue == other.longValue
-                && Double.compare(doubleValue, other.doubleValue) == 0
-                && (stringValue != null && stringValue.equals(other.stringValue) || (stringValue == null && other.stringValue == null));
-    }
-
-    @Override
-    public int hashCode() {
-        int h = hash;
-        if (h == 0) {
-            long doubleBits = Double.doubleToLongBits(doubleValue);
-            h = tag;
-            h = 31 * h + value;
-            h = 31 * h + (int) (longValue ^ (longValue >>> 32));
-            h = 31 * h + (int) (doubleBits ^ (doubleBits >>> 32));
-            h = 31 * h + (stringValue == null ? 0 : stringValue.hashCode());
-            hash = h;
-        }
-        return h;
     }
 }

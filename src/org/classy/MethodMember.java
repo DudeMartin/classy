@@ -67,8 +67,9 @@ public class MethodMember extends ClassMember {
     private void readCodeAttribute(PoolItem[] constantPool, Buffer data) {
         maxStack = data.getUnsignedShort();
         maxLocals = data.getUnsignedShort();
-        final int codeStart = data.offset;
-        final int codeEnd = codeStart + data.getInteger();
+        int codeLength = data.getInteger();
+        int codeStart = data.offset;
+        int codeEnd = codeStart + codeLength;
         while (data.offset < codeEnd) {
 
         }
