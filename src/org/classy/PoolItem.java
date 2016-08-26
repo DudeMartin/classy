@@ -84,6 +84,8 @@ public final class PoolItem {
                 value = data.getUnsignedByte();
                 longValue = data.getUnsignedShort();
                 break;
+            default:
+                throw new IllegalArgumentException(tag + " is not a valid or supported tag.");
         }
         this.value = value;
         this.longValue = longValue;

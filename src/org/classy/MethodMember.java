@@ -1,5 +1,9 @@
 package org.classy;
 
+import org.classy.Reference.ReferenceType;
+import org.classy.code.ConstantPushInstruction;
+import org.classy.code.Instruction;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -70,8 +74,65 @@ public class MethodMember extends ClassMember {
         int codeLength = data.getInteger();
         int codeStart = data.offset;
         int codeEnd = codeStart + codeLength;
+        List<Instruction> instructionList = new ArrayList<Instruction>();
         while (data.offset < codeEnd) {
-
+            int opcode = data.getUnsignedByte();
+            switch (Instruction.TYPES.get(opcode)) {
+                case CONSTANT_PUSH: {
+                    int index = (opcode == Instruction.LDC) ? data.getUnsignedByte() : data.getUnsignedShort();
+                    PoolItem item = constantPool[index];
+                    Object constant = null;
+                    switch (item.tag) {
+                        case PoolItem.CONSTANT_Integer:
+                            constant = item.value;
+                            break;
+                        case PoolItem.CONSTANT_Float:
+                            constant = (float) item.doubleValue;
+                            break;
+                        case PoolItem.CONSTANT_Long:
+                            constant = item.longValue;
+                            break;
+                        case PoolItem.CONSTANT_Double:
+                            constant = item.doubleValue;
+                            break;
+                        case PoolItem.CONSTANT_String:
+                            constant = constantPool[item.value].stringValue;
+                            break;
+                        case PoolItem.CONSTANT_Class:
+                            constant = new Reference(ReferenceType.CLASS, null, Reference.toInternalName(constantPool[item.value].stringValue), null);
+                            break;
+                        case PoolItem.CONSTANT_Fieldref:
+                        case PoolItem.CONSTANT_Methodref:
+                        case PoolItem.CONSTANT_InterfaceMethodref:
+                            ReferenceType type;
+                            switch (item.tag) {
+                                case PoolItem.CONSTANT_Fieldref:
+                                    type = ReferenceType.FIELD;
+                                    break;
+                                case PoolItem.CONSTANT_Methodref:
+                                    type = ReferenceType.METHOD;
+                                    break;
+                                case PoolItem.CONSTANT_InterfaceMethodref:
+                                    type = ReferenceType.INTERFACE_METHOD;
+                                    break;
+                                default:
+                                    throw new Error();
+                            }
+                            String owner      = constantPool[constantPool[item.value].value].stringValue;
+                            String name       = constantPool[constantPool[(int) item.longValue].value].stringValue;
+                            String descriptor = constantPool[(int) constantPool[(int) item.longValue].longValue].stringValue;
+                            constant = new Reference(type, owner, name, descriptor);
+                            break;
+                        case PoolItem.CONSTANT_MethodHandle:
+                            break;
+                        case PoolItem.CONSTANT_MethodType:
+                            constant = new Reference(ReferenceType.TYPE, null, null, constantPool[item.value].stringValue);
+                            break;
+                    }
+                    instructionList.add(new ConstantPushInstruction(opcode, constant));
+                    break;
+                }
+            }
         }
     }
 }
