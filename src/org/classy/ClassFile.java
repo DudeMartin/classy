@@ -99,15 +99,15 @@ public class ClassFile {
             } else if ("Deprecated".equals(attributeName)) {
                 deprecated = true;
             } else if ("Signature".equals(attributeName)) {
-                signature = SharedAttributes.readSignature(constantPool, data);
+                signature = Shared.readSignature(constantPool, data);
             } else if ("RuntimeVisibleAnnotations".equals(attributeName)) {
-                visibleAnnotations = SharedAttributes.readAnnotations(constantPool, data);
+                visibleAnnotations = Shared.readAnnotations(constantPool, data);
             } else if ("RuntimeInvisibleAnnotations".equals(attributeName)) {
-                invisibleAnnotations = SharedAttributes.readAnnotations(constantPool, data);
+                invisibleAnnotations = Shared.readAnnotations(constantPool, data);
             } else if ("RuntimeVisibleTypeAnnotations".equals(attributeName)) {
-                visibleTypeAnnotations = SharedAttributes.readTypeAnnotations(constantPool, data);
+                visibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data);
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
-                invisibleTypeAnnotations = SharedAttributes.readTypeAnnotations(constantPool, data);
+                invisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data);
             } else {
                 if (customAttributes == null) {
                     customAttributes = new ArrayList<CustomAttribute>(1);

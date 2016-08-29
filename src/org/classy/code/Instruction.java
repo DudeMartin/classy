@@ -8,6 +8,95 @@ import static org.classy.code.Instruction.InstructionType.*;
 
 public abstract class Instruction {
 
+    /**
+     * Represents an instruction type.
+     *
+     * @author Martin Tuskevicius
+     */
+    public enum InstructionType {
+
+        /**
+         * A zero operand instruction.
+         */
+        NULLARY,
+
+        /**
+         * An instruction that pushes a constant onto the stack as an integer.
+         */
+        PUSH,
+
+        /**
+         * An instruction that pushes an item from the constant pool onto the
+         * stack.
+         */
+        CONSTANT_PUSH,
+
+        /**
+         * An instruction that loads or stores a value in a local variable.
+         */
+        VARIABLE,
+
+        /**
+         * An instruction that increments the value of a local variable.
+         */
+        INCREMENT,
+
+        /**
+         * An instruction that jumps to a different position within a method's
+         * bytecode.
+         */
+        JUMP,
+
+        /**
+         * An instruction that uses a table of branch offsets to determine
+         * where to continue execution.
+         */
+        TABLE_SWITCH,
+
+        /**
+         * An instruction that uses a table of key-offset pairs to look up
+         * where to continue execution.
+         */
+        LOOKUP_SWITCH,
+
+        /**
+         * An instruction that retrieves or stores a value in a field.
+         */
+        FIELD,
+
+        /**
+         * An instruction that invokes a non-dynamic method.
+         */
+        METHOD,
+
+        /**
+         * An instruction that invokes a dynamic method.
+         */
+        DYNAMIC_METHOD,
+
+        /**
+         * An instruction that reads a type from the constant pool.
+         */
+        TYPE,
+
+        /**
+         * An instruction that widens a variable instruction, allowing it to
+         * specify a 16-bit index for a local variable.
+         */
+        WIDE,
+
+        /**
+         * An instruction that creates a multi-dimensional array.
+         */
+        MULTIDIMENSIONAL_ARRAY,
+
+        /**
+         * An instruction that is reserved for internal use by Java Virtual
+         * Machine implementations, or for later use.
+         */
+        RESERVED
+    }
+
     /*
      * Instruction set.
      */
@@ -216,25 +305,6 @@ public abstract class Instruction {
     public static final int BREAKPOINT      = 0xCA;
     public static final int IMPDEP1         = 0xFE;
     public static final int IMPDEP2         = 0xFF;
-
-    public enum InstructionType {
-
-        NULLARY,
-        PUSH,
-        CONSTANT_PUSH,
-        VARIABLE,
-        INCREMENT,
-        JUMP,
-        TABLE_SWITCH,
-        LOOKUP_SWITCH,
-        FIELD,
-        METHOD,
-        DYNAMIC_METHOD,
-        TYPE,
-        WIDE,
-        MULTIDIMENSIONAL_ARRAY,
-        RESERVED
-    }
 
     public static final List<InstructionType> TYPES = Collections.unmodifiableList(Arrays.asList(
             NULLARY,

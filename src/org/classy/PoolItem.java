@@ -71,12 +71,11 @@ public final class PoolItem {
                 longValue = (highBytes << 32) | lowBytes;
                 break;
             }
-            case CONSTANT_Double: {
+            case CONSTANT_Double:
                 long highBytes = data.getInteger();
                 long lowBytes = data.getInteger() & 0xFFFFFFFFL;
                 doubleValue = Double.longBitsToDouble((highBytes << 32) | lowBytes);
                 break;
-            }
             case CONSTANT_Utf8:
                 stringValue = data.getString(data.getUnsignedShort());
                 break;

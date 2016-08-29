@@ -1,8 +1,6 @@
 package org.classy;
 
-import org.classy.Reference.ReferenceType;
-import org.classy.code.ConstantPushInstruction;
-import org.classy.code.Instruction;
+import org.classy.code.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +42,13 @@ public class MethodMember extends ClassMember {
             int parameterCount = data.getUnsignedByte();
             visibleParameterAnnotations = (List<AnnotationMember>[]) new ArrayList<?>[parameterCount];
             for (int i = 0; i < parameterCount; i++) {
-                visibleParameterAnnotations[i] = SharedAttributes.readAnnotations(constantPool, data);
+                visibleParameterAnnotations[i] = Shared.readAnnotations(constantPool, data);
             }
         } else if ("RuntimeInvisibleParameterAnnotations".equals(name)) {
             int parameterCount = data.getUnsignedByte();
             invisibleParameterAnnotations = (List<AnnotationMember>[]) new ArrayList<?>[parameterCount];
             for (int i = 0; i < parameterCount; i++) {
-                invisibleParameterAnnotations[i] = SharedAttributes.readAnnotations(constantPool, data);
+                invisibleParameterAnnotations[i] = Shared.readAnnotations(constantPool, data);
             }
         } else if ("AnnotationDefault".equals(name)) {
             defaultAnnotationValue = new AnnotationMember.ElementValue(constantPool, data);
@@ -78,60 +76,18 @@ public class MethodMember extends ClassMember {
         while (data.offset < codeEnd) {
             int opcode = data.getUnsignedByte();
             switch (Instruction.TYPES.get(opcode)) {
-                case CONSTANT_PUSH: {
-                    int index = (opcode == Instruction.LDC) ? data.getUnsignedByte() : data.getUnsignedShort();
-                    PoolItem item = constantPool[index];
-                    Object constant = null;
-                    switch (item.tag) {
-                        case PoolItem.CONSTANT_Integer:
-                            constant = item.value;
-                            break;
-                        case PoolItem.CONSTANT_Float:
-                            constant = (float) item.doubleValue;
-                            break;
-                        case PoolItem.CONSTANT_Long:
-                            constant = item.longValue;
-                            break;
-                        case PoolItem.CONSTANT_Double:
-                            constant = item.doubleValue;
-                            break;
-                        case PoolItem.CONSTANT_String:
-                            constant = constantPool[item.value].stringValue;
-                            break;
-                        case PoolItem.CONSTANT_Class:
-                            constant = new Reference(ReferenceType.CLASS, null, Reference.toInternalName(constantPool[item.value].stringValue), null);
-                            break;
-                        case PoolItem.CONSTANT_Fieldref:
-                        case PoolItem.CONSTANT_Methodref:
-                        case PoolItem.CONSTANT_InterfaceMethodref:
-                            ReferenceType type;
-                            switch (item.tag) {
-                                case PoolItem.CONSTANT_Fieldref:
-                                    type = ReferenceType.FIELD;
-                                    break;
-                                case PoolItem.CONSTANT_Methodref:
-                                    type = ReferenceType.METHOD;
-                                    break;
-                                case PoolItem.CONSTANT_InterfaceMethodref:
-                                    type = ReferenceType.INTERFACE_METHOD;
-                                    break;
-                                default:
-                                    throw new Error();
-                            }
-                            String owner      = constantPool[constantPool[item.value].value].stringValue;
-                            String name       = constantPool[constantPool[(int) item.longValue].value].stringValue;
-                            String descriptor = constantPool[(int) constantPool[(int) item.longValue].longValue].stringValue;
-                            constant = new Reference(type, owner, name, descriptor);
-                            break;
-                        case PoolItem.CONSTANT_MethodHandle:
-                            break;
-                        case PoolItem.CONSTANT_MethodType:
-                            constant = new Reference(ReferenceType.TYPE, null, null, constantPool[item.value].stringValue);
-                            break;
-                    }
-                    instructionList.add(new ConstantPushInstruction(opcode, constant));
+                case NULLARY:
+                    instructionList.add(new NullaryInstruction(opcode));
                     break;
-                }
+                case PUSH:
+                    instructionList.add(new PushInstruction(opcode, (opcode == Instruction.BIPUSH) ? data.getByte() : data.getShort()));
+                    break;
+                case VARIABLE:
+                    instructionList.add(new VariableInstruction(opcode, data.getUnsignedByte()));
+                    break;
+                case CONSTANT_PUSH:
+                    instructionList.add(new ConstantPushInstruction(opcode, Shared.readConstant(constantPool, (opcode == Instruction.LDC) ? data.getUnsignedByte() : data.getUnsignedShort())));
+                    break;
             }
         }
     }
