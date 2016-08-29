@@ -21,22 +21,7 @@ public class FieldMember extends ClassMember {
 
     protected void readAttribute(PoolItem[] constantPool, Buffer data, String name, int length) {
         if ("ConstantValue".equals(name)) {
-            PoolItem item = constantPool[data.getUnsignedShort()];
-            switch (item.tag) {
-                case PoolItem.CONSTANT_Long:
-                    constantValue = item.longValue;
-                    break;
-                case PoolItem.CONSTANT_Float:
-                case PoolItem.CONSTANT_Double:
-                    constantValue = item.doubleValue;
-                    break;
-                case PoolItem.CONSTANT_Integer:
-                    constantValue = item.value;
-                    break;
-                case PoolItem.CONSTANT_String:
-                    constantValue = constantPool[item.value].stringValue;
-                    break;
-            }
+            constantValue = Shared.readConstant(constantPool, data.getUnsignedShort());
         } else {
             if (customAttributes == null) {
                 customAttributes = new ArrayList<CustomAttribute>(1);
