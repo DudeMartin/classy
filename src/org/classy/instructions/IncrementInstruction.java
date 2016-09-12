@@ -1,11 +1,11 @@
-package org.classy.code;
+package org.classy.instructions;
 
 public class IncrementInstruction extends VariableInstruction {
 
     public int delta;
 
-    public IncrementInstruction(int opcode, int index, int delta) {
-        super(opcode, index);
+    public IncrementInstruction(int index, int delta) {
+        super(IINC, index);
         this.delta = delta;
     }
 

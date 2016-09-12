@@ -1,17 +1,15 @@
-package org.classy.code;
+package org.classy.instructions;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.classy.code.Instruction.InstructionType.*;
+import static org.classy.instructions.Instruction.InstructionType.*;
 
 public abstract class Instruction {
 
     /**
      * Represents an instruction type.
-     *
-     * @author Martin Tuskevicius
      */
     public enum InstructionType {
 
@@ -75,13 +73,13 @@ public abstract class Instruction {
         DYNAMIC_METHOD,
 
         /**
-         * An instruction that reads a type from the constant pool.
+         * An instruction that reads a descriptor.
          */
         TYPE,
 
         /**
          * An instruction that widens a variable instruction, allowing it to
-         * specify a 16-bit index for a local variable.
+         * use 16-bit operands.
          */
         WIDE,
 

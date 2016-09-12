@@ -18,12 +18,12 @@ class Buffer {
         return getByte() & 0xFF;
     }
 
-    int getShort() {
-        return (getByte() << 8) + getByte();
-    }
-
     int getUnsignedShort() {
         return (getUnsignedByte() << 8) + getUnsignedByte();
+    }
+
+    int getShort() {
+        return (short) getUnsignedShort();
     }
 
     int getInteger() {

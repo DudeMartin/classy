@@ -2,18 +2,18 @@ package org.classy;
 
 import java.util.Set;
 
-public class ParameterMember {
+public class MethodParameter {
 
     public String name;
     public Set<AccessFlag> accessFlags;
 
-    public ParameterMember() {
+    public MethodParameter() {
 
     }
 
-    ParameterMember(PoolItem[] constantPool, Buffer data) {
+    MethodParameter(PoolItem[] constantPool, Buffer data) {
         int nameIndex = data.getUnsignedShort();
         name = (nameIndex == 0) ? null : constantPool[nameIndex].stringValue;
-        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.parameterFlags);
+        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.PARAMETER_FLAGS);
     }
 }

@@ -5,33 +5,33 @@ public final class PoolItem {
     /*
      * Constant pool tags.
      */
-    public static final int CONSTANT_Utf8               = 1;
-    public static final int CONSTANT_Integer            = 3;
-    public static final int CONSTANT_Float              = 4;
-    public static final int CONSTANT_Long               = 5;
-    public static final int CONSTANT_Double             = 6;
-    public static final int CONSTANT_Class              = 7;
-    public static final int CONSTANT_String             = 8;
-    public static final int CONSTANT_Fieldref           = 9;
-    public static final int CONSTANT_Methodref          = 10;
+    public static final int CONSTANT_Utf8 = 1;
+    public static final int CONSTANT_Integer = 3;
+    public static final int CONSTANT_Float = 4;
+    public static final int CONSTANT_Long = 5;
+    public static final int CONSTANT_Double = 6;
+    public static final int CONSTANT_Class = 7;
+    public static final int CONSTANT_String = 8;
+    public static final int CONSTANT_Fieldref = 9;
+    public static final int CONSTANT_Methodref = 10;
     public static final int CONSTANT_InterfaceMethodref = 11;
-    public static final int CONSTANT_NameAndType        = 12;
-    public static final int CONSTANT_MethodHandle       = 15;
-    public static final int CONSTANT_MethodType         = 16;
-    public static final int CONSTANT_InvokeDynamic      = 18;
+    public static final int CONSTANT_NameAndType = 12;
+    public static final int CONSTANT_MethodHandle = 15;
+    public static final int CONSTANT_MethodType = 16;
+    public static final int CONSTANT_InvokeDynamic = 18;
 
     /*
      * Method handle kinds.
      */
-    public static final int REF_getField         = 1;
-    public static final int REF_getStatic        = 2;
-    public static final int REF_putField         = 3;
-    public static final int REF_putStatic        = 4;
-    public static final int REF_invokeVirtual    = 5;
-    public static final int REF_invokeStatic     = 6;
-    public static final int REF_invokeSpecial    = 7;
+    public static final int REF_getField = 1;
+    public static final int REF_getStatic = 2;
+    public static final int REF_putField = 3;
+    public static final int REF_putStatic = 4;
+    public static final int REF_invokeVirtual = 5;
+    public static final int REF_invokeStatic = 6;
+    public static final int REF_invokeSpecial = 7;
     public static final int REF_newInvokeSpecial = 8;
-    public static final int REF_invokeInterface  = 9;
+    public static final int REF_invokeInterface = 9;
 
     public final int tag;
     public final int value;
@@ -84,7 +84,7 @@ public final class PoolItem {
                 longValue = data.getUnsignedShort();
                 break;
             default:
-                throw new IllegalArgumentException(tag + " is not a valid or supported tag.");
+                throw new RuntimeException(tag + " is not a valid or supported tag.");
         }
         this.value = value;
         this.longValue = longValue;

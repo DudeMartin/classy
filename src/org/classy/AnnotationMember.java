@@ -18,40 +18,26 @@ public class AnnotationMember {
 
     protected final void readAnnotation(PoolItem[] constantPool, Buffer data) {
         type = constantPool[data.getUnsignedShort()].stringValue;
-        int pairCount = data.getUnsignedShort();
-        pairs = new ArrayList<ElementPair>(pairCount);
-        while (pairCount-- > 0) {
+        int count = data.getUnsignedShort();
+        pairs = new ArrayList<ElementPair>(count);
+        while (count-- > 0) {
             pairs.add(new ElementPair(constantPool[data.getUnsignedShort()].stringValue, new ElementValue(constantPool, data)));
         }
     }
 
-    public static final class ElementValue {
+    public static class ElementValue {
 
-        public final int tag;
-        public final int value;
-        public final long longValue;
-        public final double doubleValue;
-        public final String stringValue;
-        public final String[] enumConstant;
-        public final AnnotationMember nestedAnnotation;
-        public final ElementValue[] elements;
+        public int tag;
+        public int value;
+        public long longValue;
+        public double doubleValue;
+        public String stringValue;
+        public String[] enumConstant;
+        public AnnotationMember nestedAnnotation;
+        public List<ElementValue> elements;
 
-        public ElementValue(int tag,
-                            int value,
-                            long longValue,
-                            double doubleValue,
-                            String stringValue,
-                            String[] enumConstant,
-                            AnnotationMember nestedAnnotation,
-                            ElementValue[] elements) {
-            this.tag = tag;
-            this.value = value;
-            this.longValue = longValue;
-            this.doubleValue = doubleValue;
-            this.stringValue = stringValue;
-            this.enumConstant = enumConstant;
-            this.nestedAnnotation = nestedAnnotation;
-            this.elements = elements;
+        public ElementValue() {
+
         }
 
         ElementValue(PoolItem[] constantPool, Buffer data) {
@@ -62,7 +48,7 @@ public class AnnotationMember {
             String stringValue = null;
             String[] enumConstant = null;
             AnnotationMember nestedAnnotation = null;
-            ElementValue[] elements = null;
+            List<ElementValue> elements = null;
             switch (tag) {
                 case 'B':
                 case 'C':
@@ -88,10 +74,10 @@ public class AnnotationMember {
                     nestedAnnotation = new AnnotationMember(constantPool, data);
                     break;
                 case '[':
-                    int elementCount = data.getUnsignedShort();
-                    elements = new ElementValue[elementCount];
-                    for (int i = 0; i < elementCount; i++) {
-                        elements[i] = new ElementValue(constantPool, data);
+                    int count = data.getUnsignedShort();
+                    elements = new ArrayList<ElementValue>(count);
+                    while (count-- > 0) {
+                        elements.add(new ElementValue(constantPool, data));
                     }
                     break;
             }
@@ -105,10 +91,10 @@ public class AnnotationMember {
         }
     }
 
-    public static final class ElementPair {
+    public static class ElementPair {
 
-        public final String name;
-        public final ElementValue value;
+        public String name;
+        public ElementValue value;
 
         public ElementPair(String name, ElementValue value) {
             this.name = name;

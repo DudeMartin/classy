@@ -16,7 +16,7 @@ public class FieldMember extends ClassMember {
     }
 
     protected Set<AccessFlag> sourceAccessFlags() {
-        return AccessFlag.fieldFlags;
+        return AccessFlag.FIELD_FLAGS;
     }
 
     protected void readAttribute(PoolItem[] constantPool, Buffer data, String name, int length) {

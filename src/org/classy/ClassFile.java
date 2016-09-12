@@ -37,7 +37,7 @@ public class ClassFile {
     public ClassFile(byte[] classData, int offset) {
         Buffer data = new Buffer(classData, offset);
         if (data.getInteger() != 0xCAFEBABE) {
-            throw new IllegalArgumentException("Bad magic number.");
+            throw new RuntimeException("Bad magic number.");
         }
         minorVersion = data.getUnsignedShort();
         majorVersion = data.getUnsignedShort();
@@ -52,22 +52,23 @@ public class ClassFile {
                     break;
             }
         }
-        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.classFlags);
+        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.CLASS_FLAGS);
         name = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
-        superclassName = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
-        int interfaceCount = data.getUnsignedShort();
-        interfaceNames = new ArrayList<String>(interfaceCount);
-        while (interfaceCount-- > 0) {
+        int superclassIndex = data.getUnsignedShort();
+        superclassName = (superclassIndex == 0) ? null : constantPool[constantPool[superclassIndex].value].stringValue;
+        int count = data.getUnsignedShort();
+        interfaceNames = new ArrayList<String>(count);
+        while (count-- > 0) {
             interfaceNames.add(constantPool[constantPool[data.getUnsignedShort()].value].stringValue);
         }
-        int fieldCount = data.getUnsignedShort();
-        fields = new ArrayList<FieldMember>(fieldCount);
-        while (fieldCount-- > 0) {
+        count = data.getUnsignedShort();
+        fields = new ArrayList<FieldMember>(count);
+        while (count-- > 0) {
             fields.add(new FieldMember(constantPool, data));
         }
-        int methodCount = data.getUnsignedShort();
-        methods = new ArrayList<MethodMember>(methodCount);
-        while (methodCount-- > 0) {
+        count = data.getUnsignedShort();
+        methods = new ArrayList<MethodMember>(count);
+        while (count-- > 0) {
             methods.add(new MethodMember(constantPool, data));
         }
         for (int i = data.getUnsignedShort(); i > 0; i--) {
@@ -76,22 +77,21 @@ public class ClassFile {
             if ("SourceFile".equals(attributeName)) {
                 sourceFileName = constantPool[data.getUnsignedShort()].stringValue;
             } else if ("InnerClasses".equals(attributeName)) {
-                int classCount = data.getUnsignedShort();
-                innerClasses = new ArrayList<InnerClassMember>(classCount);
-                while (classCount-- > 0) {
+                count = data.getUnsignedShort();
+                innerClasses = new ArrayList<InnerClassMember>(count);
+                while (count-- > 0) {
                     innerClasses.add(new InnerClassMember(constantPool, data));
                 }
             } else if ("EnclosingMethod".equals(attributeName)) {
                 enclosingClassName = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
-                PoolItem methodItem = constantPool[data.getUnsignedShort()];
-                enclosingMethodName = constantPool[methodItem.value].stringValue;
-                enclosingMethodDescriptor = constantPool[(int) methodItem.longValue].stringValue;
+                enclosingMethodName = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
+                enclosingMethodDescriptor = constantPool[(int) constantPool[data.getUnsignedShort()].longValue].stringValue;
             } else if ("SourceDebugExtension".equals(attributeName)) {
                 sourceDebug = data.getString(length);
             } else if ("BootstrapMethods".equals(attributeName)) {
-                int bootstrapMethodCount = data.getUnsignedShort();
-                bootstrapMethods = new ArrayList<BootstrapMethodMember>(bootstrapMethodCount);
-                while (bootstrapMethodCount-- > 0) {
+                count = data.getUnsignedShort();
+                bootstrapMethods = new ArrayList<BootstrapMethodMember>(count);
+                while (count-- > 0) {
                     bootstrapMethods.add(new BootstrapMethodMember(constantPool, data));
                 }
             } else if ("Synthetic".equals(attributeName)) {
@@ -99,15 +99,15 @@ public class ClassFile {
             } else if ("Deprecated".equals(attributeName)) {
                 deprecated = true;
             } else if ("Signature".equals(attributeName)) {
-                signature = Shared.readSignature(constantPool, data);
+                signature = constantPool[data.getUnsignedShort()].stringValue;
             } else if ("RuntimeVisibleAnnotations".equals(attributeName)) {
                 visibleAnnotations = Shared.readAnnotations(constantPool, data);
             } else if ("RuntimeInvisibleAnnotations".equals(attributeName)) {
                 invisibleAnnotations = Shared.readAnnotations(constantPool, data);
             } else if ("RuntimeVisibleTypeAnnotations".equals(attributeName)) {
-                visibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data);
+                visibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, this, null, null);
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
-                invisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data);
+                invisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, this, null, null);
             } else {
                 if (customAttributes == null) {
                     customAttributes = new ArrayList<CustomAttribute>(1);

@@ -11,9 +11,9 @@ public class BootstrapMethodMember {
 
     BootstrapMethodMember(PoolItem[] constantPool, Buffer data) {
         reference = (Reference) Shared.readConstant(constantPool, data.getUnsignedShort());
-        int argumentCount = data.getUnsignedShort();
-        arguments = new Object[argumentCount];
-        for (int i = 0; i < argumentCount; i++) {
+        int count = data.getUnsignedShort();
+        arguments = new Object[count];
+        for (int i = 0; i < count; i++) {
             arguments[i] = Shared.readConstant(constantPool, data.getUnsignedShort());
         }
     }

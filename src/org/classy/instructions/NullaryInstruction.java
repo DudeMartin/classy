@@ -1,4 +1,4 @@
-package org.classy.code;
+package org.classy.instructions;
 
 public class NullaryInstruction extends Instruction {
 

@@ -32,15 +32,15 @@ public abstract class ClassMember {
             } else if ("Deprecated".equals(attributeName)) {
                 deprecated = true;
             } else if ("Signature".equals(attributeName)) {
-                signature = Shared.readSignature(constantPool, data);
+                signature = constantPool[data.getUnsignedShort()].stringValue;
             } else if ("RuntimeVisibleAnnotations".equals(attributeName)) {
                 visibleAnnotations = Shared.readAnnotations(constantPool, data);
             } else if ("RuntimeInvisibleAnnotations".equals(attributeName)) {
                 invisibleAnnotations = Shared.readAnnotations(constantPool, data);
             } else if ("RuntimeVisibleTypeAnnotations".equals(attributeName)) {
-                visibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data);
+                visibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, (this instanceof MethodMember) ? (MethodMember) this : null, null);
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
-                invisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data);
+                invisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, (this instanceof MethodMember) ? (MethodMember) this : null, null);
             } else {
                 readAttribute(constantPool, data, attributeName, length);
             }
