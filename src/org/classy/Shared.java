@@ -44,36 +44,45 @@ class Shared {
             case PoolItem.CONSTANT_String:
                 return constantPool[item.value].stringValue;
             case PoolItem.CONSTANT_Class:
-                return new Reference(ReferenceType.CLASS, null, constantPool[item.value].stringValue, null, 0);
+                Reference classReference = new Reference();
+                classReference.type = ReferenceType.CLASS;
+                classReference.name = constantPool[item.value].stringValue;
+                return classReference;
             case PoolItem.CONSTANT_Fieldref:
             case PoolItem.CONSTANT_Methodref:
             case PoolItem.CONSTANT_InterfaceMethodref: {
-                ReferenceType type;
+                Reference methodReference = new Reference();
                 switch (item.tag) {
                     case PoolItem.CONSTANT_Fieldref:
-                        type = ReferenceType.FIELD;
+                        methodReference.type = ReferenceType.FIELD;
                         break;
                     case PoolItem.CONSTANT_Methodref:
-                        type = ReferenceType.METHOD;
+                        methodReference.type = ReferenceType.METHOD;
                         break;
                     case PoolItem.CONSTANT_InterfaceMethodref:
-                        type = ReferenceType.INTERFACE_METHOD;
+                        methodReference.type = ReferenceType.INTERFACE_METHOD;
                         break;
                     default:
                         throw new Error("Unreachable code.");
                 }
-                String owner = constantPool[constantPool[item.value].value].stringValue;
-                String name = constantPool[constantPool[(int) item.longValue].value].stringValue;
-                String descriptor = constantPool[(int) constantPool[(int) item.longValue].longValue].stringValue;
-                return new Reference(type, owner, name, descriptor, 0);
+                methodReference.owner = constantPool[constantPool[item.value].value].stringValue;
+                methodReference.name = constantPool[constantPool[(int) item.longValue].value].stringValue;
+                methodReference.descriptor = constantPool[(int) constantPool[(int) item.longValue].longValue].stringValue;
+                return methodReference;
             }
             case PoolItem.CONSTANT_MethodHandle:
-                String owner = constantPool[constantPool[constantPool[(int) item.longValue].value].value].stringValue;
-                String name = constantPool[constantPool[(int) constantPool[(int) item.longValue].longValue].value].stringValue;
-                String descriptor = constantPool[(int) constantPool[(int) constantPool[(int) item.longValue].longValue].longValue].stringValue;
-                return new Reference(ReferenceType.HANDLE, owner, name, descriptor, item.value);
+                Reference handleReference = new Reference();
+                handleReference.type = ReferenceType.HANDLE;
+                handleReference.owner = constantPool[constantPool[constantPool[(int) item.longValue].value].value].stringValue;
+                handleReference.name = constantPool[constantPool[(int) constantPool[(int) item.longValue].longValue].value].stringValue;
+                handleReference.descriptor = constantPool[(int) constantPool[(int) constantPool[(int) item.longValue].longValue].longValue].stringValue;
+                handleReference.kind = item.value;
+                return handleReference;
             case PoolItem.CONSTANT_MethodType:
-                return new Reference(ReferenceType.TYPE, null, null, constantPool[item.value].stringValue, 0);
+                Reference typeReference = new Reference();
+                typeReference.type = ReferenceType.TYPE;
+                typeReference.descriptor = constantPool[item.value].stringValue;
+                return typeReference;
         }
         throw new Error("Unreachable code.");
     }

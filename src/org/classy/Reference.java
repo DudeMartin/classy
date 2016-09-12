@@ -19,15 +19,7 @@ public class Reference {
     public String descriptor;
     public int kind;
 
-    public Reference(ReferenceType type,
-                     String owner,
-                     String name,
-                     String descriptor,
-                     int kind) {
-        this.type = type;
-        this.owner = owner;
-        this.name = name;
-        this.descriptor = descriptor;
-        this.kind = kind;
+    public Reference() {
+
     }
 }
