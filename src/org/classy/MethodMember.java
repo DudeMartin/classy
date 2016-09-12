@@ -331,7 +331,7 @@ public class MethodMember extends ClassMember {
 
     private List<StackMapFrame> readStackMapTable(PoolItem[] constantPool, Buffer data, Instruction[] instructions) {
         int frameCount = data.getUnsignedShort();
-        List<StackMapFrame> frames = new ArrayList<StackMapFrame>(frameCount + 1);
+        List<StackMapFrame> frames = new ArrayList<StackMapFrame>(frameCount);
         List<Object> locals = new ArrayList<Object>(maxLocals);
         for (int offset = 0; frameCount-- > 0; offset++) {
             int type = data.getUnsignedByte();
