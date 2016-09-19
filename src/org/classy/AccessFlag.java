@@ -4,6 +4,12 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+/**
+ * Represents an access flag. An access flag can modify the access and
+ * properties of a class, interface, enum, or class member.
+ *
+ * @author Martin Tuskevicius
+ */
 public enum AccessFlag {
 
     ACC_PUBLIC (0x0001),
@@ -26,6 +32,9 @@ public enum AccessFlag {
     ACC_ENUM (0x4000),
     ACC_MANDATED (0x8000);
 
+    /**
+     * The set of flags that can be attributed to a class, interface, or enum.
+     */
     public static final Set<AccessFlag> CLASS_FLAGS = Collections.unmodifiableSet(EnumSet.of(
             ACC_PUBLIC,
             ACC_FINAL,
@@ -36,6 +45,9 @@ public enum AccessFlag {
             ACC_ANNOTATION,
             ACC_ENUM));
 
+    /**
+     * The set of flags that can be attributed to a field.
+     */
     public static final Set<AccessFlag> FIELD_FLAGS = Collections.unmodifiableSet(EnumSet.of(
             ACC_PUBLIC,
             ACC_PRIVATE,
@@ -47,6 +59,9 @@ public enum AccessFlag {
             ACC_SYNTHETIC,
             ACC_ENUM));
 
+    /**
+     * The set of flags that can be attributed to a method.
+     */
     public static final Set<AccessFlag> METHOD_FLAGS = Collections.unmodifiableSet(EnumSet.of(
             ACC_PUBLIC,
             ACC_PRIVATE,
@@ -61,11 +76,17 @@ public enum AccessFlag {
             ACC_STRICT,
             ACC_SYNTHETIC));
 
+    /**
+     * The set of flags that can be attributed to a formal method parameter.
+     */
     public static final Set<AccessFlag> PARAMETER_FLAGS = Collections.unmodifiableSet(EnumSet.of(
             ACC_FINAL,
             ACC_SYNTHETIC,
             ACC_MANDATED));
 
+    /**
+     * The set of flags that can be attributed to an inner class.
+     */
     public static final Set<AccessFlag> INNER_CLASS_FLAGS = Collections.unmodifiableSet(EnumSet.of(
             ACC_PUBLIC,
             ACC_PRIVATE,
@@ -78,27 +99,67 @@ public enum AccessFlag {
             ACC_ANNOTATION,
             ACC_ENUM));
 
+    /**
+     * The numerical value of this flag.
+     */
     public final int value;
 
     AccessFlag(int value) {
         this.value = value;
     }
 
-    public static EnumSet<AccessFlag> set(int mask, Set<AccessFlag> source) {
+    /**
+     * Returns the set of access flags corresponding to the provided bit mask.
+     * This method requires a source flag set to be provided because some flags
+     * have identical numerical values.
+     *
+     * @param mask   the bit mask.
+     * @param source the source access flag set.
+     * @return the set of access flags. The set could be empty, but never
+     *         <code>null</code>. If <code>source</code> is <code>null</code>,
+     *         then an empty set is returned.
+     */
+    public static EnumSet<AccessFlag> forMask(int mask, Set<AccessFlag> source) {
         EnumSet<AccessFlag> flags = EnumSet.noneOf(AccessFlag.class);
-        for (AccessFlag flag : source) {
-            if ((mask & flag.value) != 0) {
-                flags.add(flag);
+        if (source != null) {
+            for (AccessFlag flag : source) {
+                if ((mask & flag.value) != 0) {
+                    flags.add(flag);
+                }
             }
         }
         return flags;
     }
 
-    public static EnumSet<AccessFlag> set(AccessFlag... flags) {
+    /**
+     * Returns a set of access flags.
+     *
+     * @param flags the array of flags to return as a set.
+     * @return the set of access flags. The set could be empty, but never
+     *         <code>null</code>.
+     */
+    public static EnumSet<AccessFlag> forFlags(AccessFlag... flags) {
         EnumSet<AccessFlag> flagSet = EnumSet.noneOf(AccessFlag.class);
         for (AccessFlag flag : flags) {
             flagSet.add(flag);
         }
         return flagSet;
+    }
+
+    /**
+     * Represents a set of access flags as a bit mask.
+     *
+     * @param flags the set of flags.
+     * @return the set represented as a bit mask. If <code>flags</code> is
+     *         <code>null</code>, then <code>0</code> is returned.
+     */
+    public static int toBitMask(Set<AccessFlag> flags) {
+        int value = 0;
+        if (flags != null) {
+            for (AccessFlag flag : flags) {
+                value |= flag.value;
+            }
+        }
+        return value;
     }
 }
