@@ -14,6 +14,6 @@ public class MethodParameter {
     MethodParameter(PoolItem[] constantPool, Buffer data) {
         int nameIndex = data.getUnsignedShort();
         name = (nameIndex == 0) ? null : constantPool[nameIndex].stringValue;
-        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.PARAMETER_FLAGS);
+        accessFlags = AccessFlag.forMask(data.getUnsignedShort(), AccessFlag.PARAMETER_FLAGS);
     }
 }

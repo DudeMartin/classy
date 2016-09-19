@@ -52,7 +52,7 @@ public class ClassFile {
                     break;
             }
         }
-        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.CLASS_FLAGS);
+        accessFlags = AccessFlag.forMask(data.getUnsignedShort(), AccessFlag.CLASS_FLAGS);
         name = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
         int superclassIndex = data.getUnsignedShort();
         superclassName = (superclassIndex == 0) ? null : constantPool[constantPool[superclassIndex].value].stringValue;

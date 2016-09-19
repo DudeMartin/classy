@@ -4,6 +4,7 @@ import org.classy.instructions.Instruction;
 
 import java.util.List;
 
+@Generated
 public class StackMapFrame {
 
     /*

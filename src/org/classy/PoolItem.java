@@ -1,5 +1,6 @@
 package org.classy;
 
+@Generated
 public final class PoolItem {
 
     /*

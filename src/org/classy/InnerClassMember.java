@@ -19,6 +19,6 @@ public class InnerClassMember {
         outerClassName = (outerClassIndex == 0) ? null : constantPool[constantPool[outerClassIndex].value].stringValue;
         int simpleNameIndex = data.getUnsignedShort();
         simpleName = (simpleNameIndex == 0) ? null : constantPool[simpleNameIndex].stringValue;
-        accessFlags = AccessFlag.set(data.getUnsignedShort(), AccessFlag.INNER_CLASS_FLAGS);
+        accessFlags = AccessFlag.forMask(data.getUnsignedShort(), AccessFlag.INNER_CLASS_FLAGS);
     }
 }

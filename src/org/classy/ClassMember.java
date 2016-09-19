@@ -21,7 +21,7 @@ public abstract class ClassMember {
     }
 
     ClassMember(PoolItem[] constantPool, Buffer data) {
-        accessFlags = AccessFlag.set(data.getUnsignedShort(), sourceAccessFlags());
+        accessFlags = AccessFlag.forMask(data.getUnsignedShort(), sourceAccessFlags());
         name = constantPool[data.getUnsignedShort()].stringValue;
         descriptor = constantPool[data.getUnsignedShort()].stringValue;
         for (int i = data.getUnsignedShort(); i > 0; i--) {
