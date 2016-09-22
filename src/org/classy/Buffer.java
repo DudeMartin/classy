@@ -90,6 +90,18 @@ class Buffer {
         directPut(value);
     }
 
+    void putLong(long value) {
+        ensureSpace(8);
+        buffer[offset++] = (byte) (value >>> 56);
+        buffer[offset++] = (byte) (value >>> 48);
+        buffer[offset++] = (byte) (value >>> 40);
+        buffer[offset++] = (byte) (value >>> 32);
+        buffer[offset++] = (byte) (value >>> 24);
+        buffer[offset++] = (byte) (value >>> 16);
+        buffer[offset++] = (byte) (value >>> 8);
+        buffer[offset++] = (byte) value;
+    }
+
     void putString(String value) {
         int length = value.length();
         int spaceNeeded = 2;
@@ -121,10 +133,10 @@ class Buffer {
         }
     }
 
-    void putBytes(byte[] bytes) {
-        ensureSpace(bytes.length);
-        System.arraycopy(bytes, 0, buffer, offset, bytes.length);
-        offset += bytes.length;
+    void putBytes(byte[] bytes, int start, int length) {
+        ensureSpace(length);
+        System.arraycopy(bytes, start, buffer, offset, length);
+        offset += length;
     }
 
     private void directPut(int value) {

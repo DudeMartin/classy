@@ -47,18 +47,8 @@ public final class PoolItem {
         double doubleValue = 0;
         String stringValue = null;
         switch (tag) {
-            case CONSTANT_Class:
-            case CONSTANT_String:
-            case CONSTANT_MethodType:
-                value = data.getUnsignedShort();
-                break;
-            case CONSTANT_Fieldref:
-            case CONSTANT_Methodref:
-            case CONSTANT_InterfaceMethodref:
-            case CONSTANT_NameAndType:
-            case CONSTANT_InvokeDynamic:
-                value = data.getUnsignedShort();
-                longValue = data.getUnsignedShort();
+            case CONSTANT_Utf8:
+                stringValue = data.getString(data.getUnsignedShort());
                 break;
             case CONSTANT_Integer:
                 value = data.getInteger();
@@ -77,8 +67,18 @@ public final class PoolItem {
                 long lowBytes = data.getInteger() & 0xFFFFFFFFL;
                 doubleValue = Double.longBitsToDouble((highBytes << 32) | lowBytes);
                 break;
-            case CONSTANT_Utf8:
-                stringValue = data.getString(data.getUnsignedShort());
+            case CONSTANT_Class:
+            case CONSTANT_String:
+            case CONSTANT_MethodType:
+                value = data.getUnsignedShort();
+                break;
+            case CONSTANT_Fieldref:
+            case CONSTANT_Methodref:
+            case CONSTANT_InterfaceMethodref:
+            case CONSTANT_NameAndType:
+            case CONSTANT_InvokeDynamic:
+                value = data.getUnsignedShort();
+                longValue = data.getUnsignedShort();
                 break;
             case CONSTANT_MethodHandle:
                 value = data.getUnsignedByte();
