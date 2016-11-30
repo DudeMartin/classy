@@ -12,7 +12,6 @@ public class Reference {
         TYPE
     }
 
-
     public ReferenceType type;
     public String owner;
     public String name;

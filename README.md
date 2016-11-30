@@ -68,5 +68,4 @@ java/lang/Object
 ```
 
 ## Limitations
-* Currently, **classy** only supports reading class files, not writing them. This means that while you can read any (valid) class file up to, and including Java 8, generating your own is (currently) unsupported. (The support for this is *coming eventually...*) From a design aspect, **classy** is designed with class modification (and generation) in mind. Where applicable, the `public` fields are mutable, which means that changing a specific detail about a class file is as simple as assigning a different value to a field.
-* The source code is currently undocumented. This is a high-priority task right now.
+* Currently, **classy** only supports reading class files, not writing them. This means that while you can read any (valid) class file up to, and including Java 8, generating your own is (currently) unsupported. From a design aspect, **classy** is designed with class modification (and generation) in mind. Where applicable, the `public` fields are mutable, which means that changing a specific detail about a class file is often as simple as assigning a different value to a field.

@@ -59,11 +59,9 @@ class Shared {
                     case PoolItem.CONSTANT_Methodref:
                         methodReference.type = ReferenceType.METHOD;
                         break;
-                    case PoolItem.CONSTANT_InterfaceMethodref:
+                    default:
                         methodReference.type = ReferenceType.INTERFACE_METHOD;
                         break;
-                    default:
-                        throw new Error("Unreachable code.");
                 }
                 methodReference.owner = constantPool[constantPool[item.value].value].stringValue;
                 methodReference.name = constantPool[constantPool[(int) item.longValue].value].stringValue;

@@ -2,8 +2,6 @@ package org.classy;
 
 import org.classy.instructions.Instruction;
 
-import java.util.List;
-
 @Generated
 public class StackMapFrame {
 
@@ -31,10 +29,12 @@ public class StackMapFrame {
     public static final int APPEND = 252;
     public static final int FULL_FRAME = 255;
 
+    public static final Object[] EMPTY = new Object[0];
+
     public int type;
     public Instruction start;
-    public List<Object> locals;
-    public List<Object> stack;
+    public Object[] locals;
+    public Object[] stack;
 
     public StackMapFrame() {
 

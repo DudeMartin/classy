@@ -70,6 +70,7 @@ public class TypeAnnotationMember extends AnnotationMember {
         readAnnotation(constantPool, data);
     }
 
+    @Generated
     public static class LocalVariableRange {
 
         public Instruction start;
@@ -133,9 +134,9 @@ public class TypeAnnotationMember extends AnnotationMember {
                     break;
                 case LOCAL_VARIABLE:
                 case RESOURCE_VARIABLE:
-                    int length = data.getUnsignedShort();
-                    localVariableTable = new LocalVariableRange[length];
-                    for (int i = 0; i < length; i++) {
+                    int count = data.getUnsignedShort();
+                    localVariableTable = new LocalVariableRange[count];
+                    for (int i = 0; i < count; i++) {
                         localVariableTable[i] = new LocalVariableRange(data, instructions);
                     }
                     break;

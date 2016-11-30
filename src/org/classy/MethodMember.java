@@ -8,12 +8,11 @@ public class MethodMember extends ClassMember {
 
     public int maxStack;
     public int maxLocals;
-    public List<Instruction> instructionList;
     public List<ExceptionHandler> exceptionHandlers;
     public List<LineNumber> lineNumbers;
     public List<LocalVariable> localVariables;
     public List<LocalVariable> localTypeVariables;
-    public List<StackMapFrame> stackMapTable;
+    public StackMapFrame[] stackMapTable;
     public List<TypeAnnotationMember> codeVisibleTypeAnnotations;
     public List<TypeAnnotationMember> codeInvisibleTypeAnnotations;
     public List<CustomAttribute> codeCustomAttributes;
@@ -78,12 +77,10 @@ public class MethodMember extends ClassMember {
         int codeLength = data.getInteger();
         Instruction[] instructions = new Instruction[codeLength];
         int instructionCount = 0;
-        instructionList = new ArrayList<Instruction>();
         for (int i = 0, codeStart = data.offset, instructionStart; i < codeLength; i += data.offset - instructionStart, instructionCount++) {
             instructionStart = data.offset;
             readInstruction(constantPool, data, codeStart, instructions, i);
         }
-        instructionList = instructionList.subList(0, instructionCount);
         int count = data.getUnsignedShort();
         exceptionHandlers = new ArrayList<ExceptionHandler>(count);
         while (count-- > 0) {
@@ -117,7 +114,7 @@ public class MethodMember extends ClassMember {
                     localTypeVariables.add(new LocalVariable(constantPool, data, instructions));
                 }
             } else if ("StackMapTable".equals(attributeName)) {
-                stackMapTable = readStackMapTable(constantPool, data, instructions);
+                readStackMapTable(constantPool, data, instructions);
             } else if ("RuntimeVisibleTypeAnnotations".equals(attributeName)) {
                 codeVisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, this, instructions);
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
@@ -242,7 +239,6 @@ public class MethodMember extends ClassMember {
                     instructions[index] = new MultidimensionalArrayInstruction(constantPool[constantPool[data.getUnsignedShort()].value].stringValue, data.getUnsignedByte());
                     break;
             }
-            instructionList.add(instructions[index]);
         } else {
             switch (Instruction.TYPES.get(opcode)) {
                 case PUSH:
@@ -308,83 +304,84 @@ public class MethodMember extends ClassMember {
         return target;
     }
 
-    private void readTypeInformation(PoolItem[] constantPool, Buffer data, Instruction[] instructions, List<Object> list) {
-        int tag = data.getUnsignedByte();
-        switch (tag) {
-            case StackMapFrame.ITEM_Double:
-            case StackMapFrame.ITEM_Long:
-                list.add(tag);
-                list.add(null);
-                break;
-            case StackMapFrame.ITEM_Object:
-                list.add(constantPool[constantPool[data.getUnsignedShort()].value].stringValue);
-                break;
-            case StackMapFrame.ITEM_Uninitialized:
-                TypeInstruction newInstruction = (TypeInstruction) instructions[data.getUnsignedShort()];
-                list.add(newInstruction.type);
-                break;
-            default:
-                list.add(tag);
-                break;
+    private void readTypeInformation(PoolItem[] constantPool,
+                                      Buffer data,
+                                      Instruction[] instructions,
+                                      Object[] array,
+                                      int index,
+                                      int count) {
+        while (count-- > 0) {
+            int tag = data.getUnsignedByte();
+            switch (tag) {
+                case StackMapFrame.ITEM_Double:
+                case StackMapFrame.ITEM_Long:
+                    array[index] = tag;
+                    break;
+                case StackMapFrame.ITEM_Object:
+                    array[index] = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
+                    break;
+                case StackMapFrame.ITEM_Uninitialized:
+                    TypeInstruction newInstruction = (TypeInstruction) instructions[data.getUnsignedShort()];
+                    array[index] = newInstruction.type;
+                    break;
+                default:
+                    array[index] = tag;
+                    break;
+            }
+            index++;
         }
     }
 
-    private List<StackMapFrame> readStackMapTable(PoolItem[] constantPool, Buffer data, Instruction[] instructions) {
+    private void readStackMapTable(PoolItem[] constantPool, Buffer data, Instruction[] instructions) {
         int frameCount = data.getUnsignedShort();
-        List<StackMapFrame> frames = new ArrayList<StackMapFrame>(frameCount);
-        List<Object> locals = new ArrayList<Object>(maxLocals);
-        for (int offset = 0; frameCount-- > 0; offset++) {
+        stackMapTable = new StackMapFrame[frameCount];
+        Object[] previous = StackMapFrame.EMPTY;
+        for (int offset = 0, i = 0; i < frameCount; offset++, i++) {
             int type = data.getUnsignedByte();
             StackMapFrame frame = new StackMapFrame();
             frame.type = type;
             if (type == StackMapFrame.FULL_FRAME) {
                 offset += data.getUnsignedShort();
                 int count = data.getUnsignedShort();
-                frame.locals = new ArrayList<Object>(count);
-                while (count-- > 0) {
-                    readTypeInformation(constantPool, data, instructions, frame.locals);
-                }
+                frame.locals = new Object[count];
+                readTypeInformation(constantPool, data, instructions, frame.locals, 0, count);
                 count = data.getUnsignedShort();
-                frame.stack = new ArrayList<Object>(count);
-                while (count-- > 0) {
-                    readTypeInformation(constantPool, data, instructions, frame.stack);
-                }
+                frame.stack = new Object[count];
+                readTypeInformation(constantPool, data, instructions, frame.stack, 0, count);
             } else if (type >= StackMapFrame.APPEND) {
                 offset += data.getUnsignedShort();
                 int toAppend = type - StackMapFrame.SAME_FRAME_EXTENDED;
-                frame.locals = new ArrayList<Object>(locals.size() + toAppend);
-                frame.locals.addAll(locals);
-                while (toAppend-- > 0) {
-                    readTypeInformation(constantPool, data, instructions, frame.locals);
-                }
-                frame.stack = new ArrayList<Object>(0);
+                frame.locals = new Object[previous.length + toAppend];
+                System.arraycopy(previous, 0, frame.locals, 0, previous.length);
+                readTypeInformation(constantPool, data, instructions, frame.locals, previous.length, toAppend);
+                frame.stack = StackMapFrame.EMPTY;
             } else if (type == StackMapFrame.SAME_FRAME_EXTENDED) {
                 offset += data.getUnsignedShort();
-                frame.locals = new ArrayList<Object>(locals);
-                frame.stack = new ArrayList<Object>(0);
+                frame.locals = previous.clone();
+                frame.stack = StackMapFrame.EMPTY;
             } else if (type >= StackMapFrame.CHOP) {
                 offset += data.getUnsignedShort();
-                frame.locals = new ArrayList<Object>(locals.subList(0, locals.size() - (StackMapFrame.SAME_FRAME_EXTENDED - type)));
-                frame.stack = new ArrayList<Object>(0);
+                frame.locals = new Object[previous.length + type - StackMapFrame.SAME_FRAME_EXTENDED];
+                System.arraycopy(previous, 0, frame.locals, 0, frame.locals.length);
+                frame.stack = StackMapFrame.EMPTY;
             } else if (type == StackMapFrame.SAME_LOCALS_1_STACK_ITEM_EXTENDED) {
                 offset += data.getUnsignedShort();
-                frame.locals = new ArrayList<Object>(locals);
-                frame.stack = new ArrayList<Object>(1);
-                readTypeInformation(constantPool, data, instructions, frame.stack);
+                frame.locals = previous.clone();
+                frame.stack = new Object[1];
+                readTypeInformation(constantPool, data, instructions, frame.stack, 0, 1);
             } else if (type >= StackMapFrame.SAME_LOCALS_1_STACK_ITEM) {
                 offset += type - StackMapFrame.SAME_LOCALS_1_STACK_ITEM;
-                frame.locals = new ArrayList<Object>(locals);
-                frame.stack = new ArrayList<Object>(1);
-                readTypeInformation(constantPool, data, instructions, frame.stack);
+                frame.locals = previous.clone();
+                frame.stack = new Object[1];
+                readTypeInformation(constantPool, data, instructions, frame.stack, 0, 1);
             } else {
                 offset += type;
-                frame.locals = new ArrayList<Object>(locals);
-                frame.stack = new ArrayList<Object>(0);
+                frame.locals = previous.clone();
+                frame.stack = StackMapFrame.EMPTY;
             }
             frame.start = instructions[offset];
-            frames.add(frame);
-            locals = frame.locals;
+            stackMapTable[i] = frame;
+            previous = frame.locals;
         }
-        return frames;
     }
 }
