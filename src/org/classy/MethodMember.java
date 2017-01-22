@@ -8,6 +8,7 @@ public class MethodMember extends ClassMember {
 
     public int maxStack;
     public int maxLocals;
+    public List<Instruction> instructions;
     public List<ExceptionHandler> exceptionHandlers;
     public List<LineNumber> lineNumbers;
     public List<LocalVariable> localVariables;
@@ -75,16 +76,23 @@ public class MethodMember extends ClassMember {
         maxStack = data.getUnsignedShort();
         maxLocals = data.getUnsignedShort();
         int codeLength = data.getInteger();
-        Instruction[] instructions = new Instruction[codeLength];
+        Instruction[] codeInstructions = new Instruction[codeLength];
         int instructionCount = 0;
         for (int i = 0, codeStart = data.offset, instructionStart; i < codeLength; i += data.offset - instructionStart, instructionCount++) {
             instructionStart = data.offset;
-            readInstruction(constantPool, data, codeStart, instructions, i);
+            readInstruction(constantPool, data, codeStart, codeInstructions, i);
+        }
+        instructions = new ArrayList<Instruction>(instructionCount);
+        for (int i = 0; i < codeLength; i++) {
+            Instruction instruction = codeInstructions[i];
+            if (instruction != null) {
+                instructions.add(instruction);
+            }
         }
         int count = data.getUnsignedShort();
         exceptionHandlers = new ArrayList<ExceptionHandler>(count);
         while (count-- > 0) {
-            exceptionHandlers.add(new ExceptionHandler(constantPool, data, instructions));
+            exceptionHandlers.add(new ExceptionHandler(constantPool, data, codeInstructions));
         }
         for (int i = data.getUnsignedShort(); i > 0; i--) {
             String attributeName = constantPool[data.getUnsignedShort()].stringValue;
@@ -95,7 +103,7 @@ public class MethodMember extends ClassMember {
                     lineNumbers = new ArrayList<LineNumber>(count);
                 }
                 while (count-- > 0) {
-                    lineNumbers.add(new LineNumber(data, instructions));
+                    lineNumbers.add(new LineNumber(data, codeInstructions));
                 }
             } else if ("LocalVariableTable".equals(attributeName)) {
                 count = data.getUnsignedShort();
@@ -103,7 +111,7 @@ public class MethodMember extends ClassMember {
                     localVariables = new ArrayList<LocalVariable>(count);
                 }
                 while (count-- > 0) {
-                    localVariables.add(new LocalVariable(constantPool, data, instructions));
+                    localVariables.add(new LocalVariable(constantPool, data, codeInstructions));
                 }
             } else if ("LocalVariableTypeTable".equals(attributeName)) {
                 count = data.getUnsignedShort();
@@ -111,14 +119,14 @@ public class MethodMember extends ClassMember {
                     localTypeVariables = new ArrayList<LocalVariable>(count);
                 }
                 while (count-- > 0) {
-                    localTypeVariables.add(new LocalVariable(constantPool, data, instructions));
+                    localTypeVariables.add(new LocalVariable(constantPool, data, codeInstructions));
                 }
             } else if ("StackMapTable".equals(attributeName)) {
-                readStackMapTable(constantPool, data, instructions);
+                readStackMapTable(constantPool, data, codeInstructions);
             } else if ("RuntimeVisibleTypeAnnotations".equals(attributeName)) {
-                codeVisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, this, instructions);
+                codeVisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, this, codeInstructions);
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
-                codeInvisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, this, instructions);
+                codeInvisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, this, codeInstructions);
             } else {
                 if (codeCustomAttributes == null) {
                     codeCustomAttributes = new ArrayList<CustomAttribute>(1);
