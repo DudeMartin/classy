@@ -19,11 +19,12 @@ class Buffer {
     }
 
     int getUnsignedByte() {
-        return getByte() & 0xFF;
+        return buffer[offset++] & 0xFF;
     }
 
     int getUnsignedShort() {
-        return (getUnsignedByte() << 8) + getUnsignedByte();
+        offset += 2;
+        return ((buffer[offset - 2] & 0xFF) << 8) | (buffer[offset - 1] & 0xFF);
     }
 
     int getShort() {
@@ -31,7 +32,11 @@ class Buffer {
     }
 
     int getInteger() {
-        return (getUnsignedShort() << 16) + getUnsignedShort();
+        offset += 4;
+        return ((buffer[offset - 4] & 0xFF) << 24)
+                | ((buffer[offset - 3] & 0xFF) << 16)
+                | ((buffer[offset - 2] & 0xFF) << 8)
+                | (buffer[offset - 1] & 0xFF);
     }
 
     String getString(int encodedLength) {

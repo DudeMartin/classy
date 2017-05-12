@@ -13,7 +13,7 @@ public class MethodMember extends ClassMember {
     public List<LineNumber> lineNumbers;
     public List<LocalVariable> localVariables;
     public List<LocalVariable> localTypeVariables;
-    public StackMapFrame[] stackMapTable;
+    @Generated public StackMapFrame[] stackMapTable;
     public List<TypeAnnotationMember> codeVisibleTypeAnnotations;
     public List<TypeAnnotationMember> codeInvisibleTypeAnnotations;
     public List<CustomAttribute> codeCustomAttributes;

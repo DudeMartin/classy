@@ -2,7 +2,6 @@ package org.classy;
 
 import org.classy.instructions.Instruction;
 
-@Generated
 public class StackMapFrame {
 
     /*

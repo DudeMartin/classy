@@ -52,15 +52,9 @@ public class TypeAnnotationMember extends AnnotationMember {
                          MethodMember method,
                          Instruction[] instructions) {
         type = data.getUnsignedByte();
-        switch (type) {
-            case FIELD_DECLARATION:
-            case METHOD_RETURN:
-            case METHOD_RECEIVER:
-                break;
-            default:
-                information = new TypeInformation(data, classFile, method, instructions, type);
-                break;
-        }
+        information = (type == FIELD_DECLARATION || type == METHOD_RETURN || type == METHOD_RECEIVER)
+                ? null
+                : new TypeInformation(data, classFile, method, instructions, type);
         int length = data.getUnsignedByte();
         path = new int[length][2];
         for (int i = 0; i < length; i++) {
@@ -70,7 +64,6 @@ public class TypeAnnotationMember extends AnnotationMember {
         readAnnotation(constantPool, data);
     }
 
-    @Generated
     public static class LocalVariableRange {
 
         public Instruction start;
@@ -95,7 +88,7 @@ public class TypeAnnotationMember extends AnnotationMember {
         public int value;
         public int secondValue;
         public String stringValue;
-        public LocalVariableRange[] localVariableTable;
+        @Generated public LocalVariableRange[] localVariableTable;
         public ExceptionHandler exceptionHandler;
         public Instruction instruction;
 

@@ -9,6 +9,14 @@ public class JumpInstruction extends Instruction {
         this.target = target;
     }
 
+    public boolean isConditional() {
+        int opcode = getOpcode();
+        return opcode != Instruction.GOTO
+                && opcode != Instruction.JSR
+                && opcode != Instruction.GOTO_W
+                && opcode != Instruction.JSR_W;
+    }
+
     @Override
     public InstructionType getType() {
         return InstructionType.JUMP;

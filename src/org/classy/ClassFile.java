@@ -8,7 +8,7 @@ public class ClassFile {
 
     public int minorVersion;
     public int majorVersion;
-    public PoolItem[] constantPool;
+    @Generated public PoolItem[] constantPool;
     public Set<AccessFlag> accessFlags;
     public String name;
     public String superclassName;
@@ -17,9 +17,7 @@ public class ClassFile {
     public List<MethodMember> methods;
     public String sourceFileName;
     public List<InnerClassMember> innerClasses;
-    public String enclosingClassName;
-    public String enclosingMethodName;
-    public String enclosingMethodDescriptor;
+    public Reference enclosingMethod;
     public String sourceDebug;
     public List<BootstrapMethodMember> bootstrapMethods;
     public boolean deprecated;
@@ -83,9 +81,14 @@ public class ClassFile {
                     innerClasses.add(new InnerClassMember(constantPool, data));
                 }
             } else if ("EnclosingMethod".equals(attributeName)) {
-                enclosingClassName = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
-                enclosingMethodName = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
-                enclosingMethodDescriptor = constantPool[(int) constantPool[data.getUnsignedShort()].longValue].stringValue;
+                enclosingMethod = new Reference();
+                enclosingMethod.type = Reference.ReferenceType.METHOD;
+                enclosingMethod.owner = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
+                int methodIndex = data.getUnsignedShort();
+                if (methodIndex != 0) {
+                    enclosingMethod.name = constantPool[constantPool[methodIndex].value].stringValue;
+                    enclosingMethod.name = constantPool[(int) constantPool[methodIndex].longValue].stringValue;
+                }
             } else if ("SourceDebugExtension".equals(attributeName)) {
                 sourceDebug = data.getString(length);
             } else if ("BootstrapMethods".equals(attributeName)) {
