@@ -1,8 +1,25 @@
 package org.classy;
 
-import org.classy.instructions.*;
+import org.classy.instructions.ConstantPushInstruction;
+import org.classy.instructions.DynamicMethodInstruction;
+import org.classy.instructions.FieldInstruction;
+import org.classy.instructions.IncrementInstruction;
+import org.classy.instructions.Instruction;
+import org.classy.instructions.JumpInstruction;
+import org.classy.instructions.LookupSwitchInstruction;
+import org.classy.instructions.MethodInstruction;
+import org.classy.instructions.MultidimensionalArrayInstruction;
+import org.classy.instructions.NullaryInstruction;
+import org.classy.instructions.PushInstruction;
+import org.classy.instructions.TableSwitchInstruction;
+import org.classy.instructions.TypeInstruction;
+import org.classy.instructions.VariableInstruction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class MethodMember extends ClassMember {
 
