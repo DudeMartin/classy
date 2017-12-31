@@ -23,8 +23,8 @@ import java.util.TreeMap;
 
 public class MethodMember extends ClassMember {
 
-    public int maxStack;
-    public int maxLocals;
+    @Generated public int maxStack;
+    @Generated public int maxLocals;
     public List<Instruction> instructions;
     public List<ExceptionHandler> exceptionHandlers;
     public List<LineNumber> lineNumbers;
