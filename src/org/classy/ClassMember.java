@@ -20,7 +20,8 @@ public abstract class ClassMember {
 
     }
 
-    ClassMember(PoolItem[] constantPool, Buffer data) {
+    ClassMember(ClassFile ownerClass, Buffer data) {
+        PoolItem[] constantPool = ownerClass.constantPool;
         accessFlags = AccessFlag.forMask(data.getUnsignedShort(), sourceAccessFlags());
         name = constantPool[data.getUnsignedShort()].stringValue;
         descriptor = constantPool[data.getUnsignedShort()].stringValue;
@@ -42,11 +43,11 @@ public abstract class ClassMember {
             } else if ("RuntimeInvisibleTypeAnnotations".equals(attributeName)) {
                 invisibleTypeAnnotations = Shared.readTypeAnnotations(constantPool, data, null, (this instanceof MethodMember) ? (MethodMember) this : null, null);
             } else {
-                readAttribute(constantPool, data, attributeName, length);
+                readAttribute(ownerClass, data, attributeName, length);
             }
         }
     }
 
     protected abstract Set<AccessFlag> sourceAccessFlags();
-    protected abstract void readAttribute(PoolItem[] constantPool, Buffer data, String name, int length);
+    protected abstract void readAttribute(ClassFile ownerClass, Buffer data, String name, int length);
 }

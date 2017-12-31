@@ -33,6 +33,8 @@ class Shared {
     static Object readConstant(PoolItem[] constantPool, int index) {
         PoolItem item = constantPool[index];
         switch (item.tag) {
+            case PoolItem.CONSTANT_Utf8:
+                return item.stringValue;
             case PoolItem.CONSTANT_Integer:
                 return item.value;
             case PoolItem.CONSTANT_Float:

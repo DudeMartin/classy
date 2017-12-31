@@ -27,17 +27,18 @@ public class MethodMember extends ClassMember {
 
     }
 
-    MethodMember(PoolItem[] constantPool, Buffer data) {
-        super(constantPool, data);
+    MethodMember(ClassFile ownerClass, Buffer data) {
+        super(ownerClass, data);
     }
 
     protected Set<AccessFlag> sourceAccessFlags() {
         return AccessFlag.METHOD_FLAGS;
     }
 
-    protected void readAttribute(PoolItem[] constantPool, Buffer data, String name, int length) {
+    protected void readAttribute(ClassFile ownerClass, Buffer data, String name, int length) {
+        PoolItem[] constantPool = ownerClass.constantPool;
         if ("Code".equals(name)) {
-            readCodeAttribute(constantPool, data);
+            readCodeAttribute(constantPool, ownerClass.bootstrapMethods, data);
         } else if ("Exceptions".equals(name)) {
             int count = data.getUnsignedShort();
             exceptions = new ArrayList<String>(count);
@@ -72,7 +73,7 @@ public class MethodMember extends ClassMember {
         }
     }
 
-    private void readCodeAttribute(PoolItem[] constantPool, Buffer data) {
+    private void readCodeAttribute(PoolItem[] constantPool, List<BootstrapMethodMember> bootstrapMethods, Buffer data) {
         maxStack = data.getUnsignedShort();
         maxLocals = data.getUnsignedShort();
         int codeLength = data.getInteger();
@@ -80,7 +81,7 @@ public class MethodMember extends ClassMember {
         int instructionCount = 0;
         for (int i = 0, codeStart = data.offset, instructionStart; i < codeLength; i += data.offset - instructionStart, instructionCount++) {
             instructionStart = data.offset;
-            readInstruction(constantPool, data, codeStart, codeInstructions, i);
+            readInstruction(constantPool, bootstrapMethods, data, codeStart, codeInstructions, i);
         }
         instructions = new ArrayList<Instruction>(instructionCount);
         for (int i = 0; i < codeLength; i++) {
@@ -137,6 +138,7 @@ public class MethodMember extends ClassMember {
     }
 
     private void readInstruction(PoolItem[] constantPool,
+                                 List<BootstrapMethodMember> bootstrapMethods,
                                  Buffer data,
                                  int codeStart,
                                  Instruction[] instructions,
@@ -160,28 +162,28 @@ public class MethodMember extends ClassMember {
                     instructions[index] = new ConstantPushInstruction(opcode, Shared.readConstant(constantPool, (opcode == Instruction.LDC) ? data.getUnsignedByte() : data.getUnsignedShort()));
                     break;
                 case JUMP:
-                    instructions[index] = new JumpInstruction(opcode, readTarget(constantPool, data, codeStart, instructions, index, (opcode == Instruction.GOTO_W || opcode == Instruction.JSR_W) ? data.getInteger() : data.getShort()));
+                    instructions[index] = new JumpInstruction(opcode, readTarget(constantPool, bootstrapMethods, data, codeStart, instructions, index, (opcode == Instruction.GOTO_W || opcode == Instruction.JSR_W) ? data.getInteger() : data.getShort()));
                     break;
                 case TABLE_SWITCH: {
                     data.offset += 3 - (index & 3);
-                    Instruction defaultTarget = readTarget(constantPool, data, codeStart, instructions, index, data.getInteger());
+                    Instruction defaultTarget = readTarget(constantPool, bootstrapMethods, data, codeStart, instructions, index, data.getInteger());
                     int low = data.getInteger();
                     int high = data.getInteger();
                     int count = high - low + 1;
                     List<Instruction> targets = new ArrayList<Instruction>(count);
                     while (count-- > 0) {
-                        targets.add(readTarget(constantPool, data, codeStart, instructions, index, data.getInteger()));
+                        targets.add(readTarget(constantPool, bootstrapMethods, data, codeStart, instructions, index, data.getInteger()));
                     }
                     instructions[index] = new TableSwitchInstruction(low, high, defaultTarget, targets);
                     break;
                 }
                 case LOOKUP_SWITCH:
                     data.offset += 3 - (index & 3);
-                    Instruction defaultTarget = readTarget(constantPool, data, codeStart, instructions, index, data.getInteger());
+                    Instruction defaultTarget = readTarget(constantPool, bootstrapMethods, data, codeStart, instructions, index, data.getInteger());
                     SortedMap<Integer, Instruction> targets = new TreeMap<Integer, Instruction>();
                     int count = data.getInteger();
                     while (count-- > 0) {
-                        targets.put(data.getInteger(), readTarget(constantPool, data, codeStart, instructions, index, data.getInteger()));
+                        targets.put(data.getInteger(), readTarget(constantPool, bootstrapMethods, data, codeStart, instructions, index, data.getInteger()));
                     }
                     instructions[index] = new LookupSwitchInstruction(defaultTarget, targets);
                     break;
@@ -195,7 +197,11 @@ public class MethodMember extends ClassMember {
                     }
                     break;
                 case DYNAMIC_METHOD:
-                    instructions[index] = new DynamicMethodInstruction((Reference) Shared.readConstant(constantPool, data.getUnsignedShort()));
+                    PoolItem invokeDynamicItem = constantPool[data.getUnsignedShort()];
+                    instructions[index] = new DynamicMethodInstruction(
+                            bootstrapMethods.get(invokeDynamicItem.value),
+                            (String) Shared.readConstant(constantPool, constantPool[(int) invokeDynamicItem.longValue].value),
+                            (String) Shared.readConstant(constantPool, (int) constantPool[(int) invokeDynamicItem.longValue].longValue));
                     data.offset += 2;
                     break;
                 case TYPE:
@@ -237,10 +243,11 @@ public class MethodMember extends ClassMember {
                     break;
                 case WIDE:
                     opcode = data.getUnsignedByte();
+                    int variableIndex = data.getUnsignedShort();
                     if (opcode == Instruction.IINC) {
-                        instructions[index] = new IncrementInstruction(data.getUnsignedShort(), data.getShort());
+                        instructions[index] = new IncrementInstruction(variableIndex, data.getShort());
                     } else {
-                        instructions[index] = new VariableInstruction(opcode, data.getUnsignedShort());
+                        instructions[index] = new VariableInstruction(opcode, variableIndex);
                     }
                     break;
                 case MULTIDIMENSIONAL_ARRAY:
@@ -265,14 +272,6 @@ public class MethodMember extends ClassMember {
                 case JUMP:
                     data.offset += (opcode == Instruction.GOTO_W || opcode == Instruction.JSR_W) ? 4 : 2;
                     break;
-                case TABLE_SWITCH:
-                    data.offset += 7 - (index & 3);
-                    data.offset += (-data.getInteger() + data.getInteger() + 1) * 4;
-                    break;
-                case LOOKUP_SWITCH:
-                    data.offset += 7 - (index & 3);
-                    data.offset += data.getInteger() * 8;
-                    break;
                 case METHOD:
                     data.offset += 2;
                     if (opcode == Instruction.INVOKEINTERFACE) {
@@ -286,7 +285,8 @@ public class MethodMember extends ClassMember {
                     data.offset += (opcode == Instruction.NEWARRAY) ? 1 : 2;
                     break;
                 case WIDE:
-                    data.offset += (data.getUnsignedByte() == Instruction.IINC) ? 4 : 2;
+                    opcode = data.getUnsignedByte();
+                    data.offset += (opcode == Instruction.IINC) ? 4 : 2;
                     break;
                 case MULTIDIMENSIONAL_ARRAY:
                     data.offset += 3;
@@ -296,6 +296,7 @@ public class MethodMember extends ClassMember {
     }
 
     private Instruction readTarget(PoolItem[] constantPool,
+                                   List<BootstrapMethodMember> bootstrapMethods,
                                    Buffer data,
                                    int codeStart,
                                    Instruction[] instructions,
@@ -305,7 +306,7 @@ public class MethodMember extends ClassMember {
         if (target == null) {
             int current = data.offset;
             data.offset = codeStart + index + offset;
-            readInstruction(constantPool, data, codeStart, instructions, index + offset);
+            readInstruction(constantPool, bootstrapMethods, data, codeStart, instructions, index + offset);
             data.offset = current;
             return instructions[index + offset];
         }
