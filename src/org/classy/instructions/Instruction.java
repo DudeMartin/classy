@@ -4,7 +4,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.classy.instructions.Instruction.InstructionType.*;
+import static org.classy.instructions.Instruction.InstructionType.CONSTANT_PUSH;
+import static org.classy.instructions.Instruction.InstructionType.DYNAMIC_METHOD;
+import static org.classy.instructions.Instruction.InstructionType.FIELD;
+import static org.classy.instructions.Instruction.InstructionType.INCREMENT;
+import static org.classy.instructions.Instruction.InstructionType.JUMP;
+import static org.classy.instructions.Instruction.InstructionType.LOOKUP_SWITCH;
+import static org.classy.instructions.Instruction.InstructionType.METHOD;
+import static org.classy.instructions.Instruction.InstructionType.MULTIDIMENSIONAL_ARRAY;
+import static org.classy.instructions.Instruction.InstructionType.NULLARY;
+import static org.classy.instructions.Instruction.InstructionType.PUSH;
+import static org.classy.instructions.Instruction.InstructionType.RESERVED;
+import static org.classy.instructions.Instruction.InstructionType.TABLE_SWITCH;
+import static org.classy.instructions.Instruction.InstructionType.TYPE;
+import static org.classy.instructions.Instruction.InstructionType.VARIABLE;
 
 public abstract class Instruction {
 

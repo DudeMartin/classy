@@ -1,11 +1,18 @@
 package org.classy.instructions;
 
-import org.classy.Reference;
+import org.classy.BootstrapMethodMember;
 
-public class DynamicMethodInstruction extends MethodInstruction {
+public class DynamicMethodInstruction extends Instruction {
 
-    public DynamicMethodInstruction(Reference method) {
-        super(INVOKEDYNAMIC, method);
+    public BootstrapMethodMember bootstrapMethod;
+    public String name;
+    public String descriptor;
+
+    public DynamicMethodInstruction(BootstrapMethodMember bootstrapMethod, String name, String descriptor) {
+        super(INVOKEDYNAMIC);
+        this.bootstrapMethod = bootstrapMethod;
+        this.name = name;
+        this.descriptor = descriptor;
     }
 
     @Override

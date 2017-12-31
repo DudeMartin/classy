@@ -62,12 +62,16 @@ public class ClassFile {
         count = data.getUnsignedShort();
         fields = new ArrayList<FieldMember>(count);
         while (count-- > 0) {
-            fields.add(new FieldMember(constantPool, data));
+            fields.add(new FieldMember(this, data));
         }
-        count = data.getUnsignedShort();
-        methods = new ArrayList<MethodMember>(count);
-        while (count-- > 0) {
-            methods.add(new MethodMember(constantPool, data));
+        int methodStartOffset = data.offset;
+        for (count = data.getUnsignedShort(); count > 0; count--) {
+            data.offset += 6;
+            for (int attributeCount = data.getUnsignedShort(); attributeCount > 0; attributeCount--) {
+                data.offset += 2;
+                int attributeLength = data.getInteger();
+                data.offset += attributeLength;
+            }
         }
         for (int i = data.getUnsignedShort(); i > 0; i--) {
             String attributeName = constantPool[data.getUnsignedShort()].stringValue;
@@ -117,6 +121,12 @@ public class ClassFile {
                 }
                 customAttributes.add(new CustomAttribute(data, attributeName, length));
             }
+        }
+        data.offset = methodStartOffset;
+        count = data.getUnsignedShort();
+        methods = new ArrayList<MethodMember>(count);
+        while (count-- > 0) {
+            methods.add(new MethodMember(this, data));
         }
     }
 

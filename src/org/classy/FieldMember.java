@@ -11,17 +11,17 @@ public class FieldMember extends ClassMember {
 
     }
 
-    FieldMember(PoolItem[] constantPool, Buffer data) {
-        super(constantPool, data);
+    FieldMember(ClassFile ownerClass, Buffer data) {
+        super(ownerClass, data);
     }
 
     protected Set<AccessFlag> sourceAccessFlags() {
         return AccessFlag.FIELD_FLAGS;
     }
 
-    protected void readAttribute(PoolItem[] constantPool, Buffer data, String name, int length) {
+    protected void readAttribute(ClassFile ownerClass, Buffer data, String name, int length) {
         if ("ConstantValue".equals(name)) {
-            constantValue = Shared.readConstant(constantPool, data.getUnsignedShort());
+            constantValue = Shared.readConstant(ownerClass.constantPool, data.getUnsignedShort());
         } else {
             if (customAttributes == null) {
                 customAttributes = new ArrayList<CustomAttribute>(1);
