@@ -205,10 +205,10 @@ public class MethodMember extends ClassMember {
                     instructions[index] = new LookupSwitchInstruction(defaultTarget, targets);
                     break;
                 case FIELD:
-                    instructions[index] = new FieldInstruction(opcode, (Reference) Shared.readConstant(constantPool, data.getUnsignedShort()));
+                    instructions[index] = new FieldInstruction(opcode, (SymbolicReference) Shared.readConstant(constantPool, data.getUnsignedShort()));
                     break;
                 case METHOD:
-                    instructions[index] = new MethodInstruction(opcode, (Reference) Shared.readConstant(constantPool, data.getUnsignedShort()));
+                    instructions[index] = new MethodInstruction(opcode, (SymbolicReference) Shared.readConstant(constantPool, data.getUnsignedShort()));
                     if (opcode == Instruction.INVOKEINTERFACE) {
                         data.offset += 2;
                     }

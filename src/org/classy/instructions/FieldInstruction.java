@@ -1,12 +1,12 @@
 package org.classy.instructions;
 
-import org.classy.Reference;
+import org.classy.SymbolicReference;
 
 public class FieldInstruction extends Instruction {
 
-    public Reference field;
+    public SymbolicReference field;
 
-    public FieldInstruction(int opcode, Reference field) {
+    public FieldInstruction(int opcode, SymbolicReference field) {
         super(opcode);
         this.field = field;
     }

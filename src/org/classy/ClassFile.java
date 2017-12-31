@@ -17,7 +17,7 @@ public class ClassFile {
     public List<MethodMember> methods;
     public String sourceFileName;
     public List<InnerClassMember> innerClasses;
-    public Reference enclosingMethod;
+    public SymbolicReference enclosingMethod;
     public String sourceDebug;
     public List<BootstrapMethodMember> bootstrapMethods;
     public boolean deprecated;
@@ -85,8 +85,8 @@ public class ClassFile {
                     innerClasses.add(new InnerClassMember(constantPool, data));
                 }
             } else if ("EnclosingMethod".equals(attributeName)) {
-                enclosingMethod = new Reference();
-                enclosingMethod.type = Reference.ReferenceType.METHOD;
+                enclosingMethod = new SymbolicReference();
+                enclosingMethod.type = SymbolicReference.ReferenceType.METHOD;
                 enclosingMethod.owner = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
                 int methodIndex = data.getUnsignedShort();
                 if (methodIndex != 0) {

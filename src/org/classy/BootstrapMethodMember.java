@@ -2,7 +2,7 @@ package org.classy;
 
 public class BootstrapMethodMember {
 
-    public Reference reference;
+    public SymbolicReference reference;
     public Object[] arguments;
 
     public BootstrapMethodMember() {
@@ -10,7 +10,7 @@ public class BootstrapMethodMember {
     }
 
     BootstrapMethodMember(PoolItem[] constantPool, Buffer data) {
-        reference = (Reference) Shared.readConstant(constantPool, data.getUnsignedShort());
+        reference = (SymbolicReference) Shared.readConstant(constantPool, data.getUnsignedShort());
         int count = data.getUnsignedShort();
         arguments = new Object[count];
         for (int i = 0; i < count; i++) {

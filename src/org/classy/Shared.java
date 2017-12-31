@@ -1,6 +1,6 @@
 package org.classy;
 
-import org.classy.Reference.ReferenceType;
+import org.classy.SymbolicReference.ReferenceType;
 import org.classy.instructions.Instruction;
 
 import java.util.ArrayList;
@@ -46,14 +46,14 @@ class Shared {
             case PoolItem.CONSTANT_String:
                 return constantPool[item.value].stringValue;
             case PoolItem.CONSTANT_Class:
-                Reference classReference = new Reference();
+                SymbolicReference classReference = new SymbolicReference();
                 classReference.type = ReferenceType.CLASS;
                 classReference.name = constantPool[item.value].stringValue;
                 return classReference;
             case PoolItem.CONSTANT_Fieldref:
             case PoolItem.CONSTANT_Methodref:
             case PoolItem.CONSTANT_InterfaceMethodref: {
-                Reference methodReference = new Reference();
+                SymbolicReference methodReference = new SymbolicReference();
                 switch (item.tag) {
                     case PoolItem.CONSTANT_Fieldref:
                         methodReference.type = ReferenceType.FIELD;
@@ -71,7 +71,7 @@ class Shared {
                 return methodReference;
             }
             case PoolItem.CONSTANT_MethodHandle:
-                Reference handleReference = new Reference();
+                SymbolicReference handleReference = new SymbolicReference();
                 handleReference.type = ReferenceType.HANDLE;
                 handleReference.owner = constantPool[constantPool[constantPool[(int) item.longValue].value].value].stringValue;
                 handleReference.name = constantPool[constantPool[(int) constantPool[(int) item.longValue].longValue].value].stringValue;
@@ -79,7 +79,7 @@ class Shared {
                 handleReference.kind = item.value;
                 return handleReference;
             case PoolItem.CONSTANT_MethodType:
-                Reference typeReference = new Reference();
+                SymbolicReference typeReference = new SymbolicReference();
                 typeReference.type = ReferenceType.TYPE;
                 typeReference.descriptor = constantPool[item.value].stringValue;
                 return typeReference;

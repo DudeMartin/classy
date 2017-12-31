@@ -1,12 +1,12 @@
 package org.classy.instructions;
 
-import org.classy.Reference;
+import org.classy.SymbolicReference;
 
 public class MethodInstruction extends Instruction {
 
-    public Reference method;
+    public SymbolicReference method;
 
-    public MethodInstruction(int opcode, Reference method) {
+    public MethodInstruction(int opcode, SymbolicReference method) {
         super(opcode);
         this.method = method;
     }

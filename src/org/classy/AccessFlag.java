@@ -98,9 +98,7 @@ public enum AccessFlag {
 
     public static EnumSet<AccessFlag> forFlags(AccessFlag... flags) {
         EnumSet<AccessFlag> flagSet = EnumSet.noneOf(AccessFlag.class);
-        for (AccessFlag flag : flags) {
-            flagSet.add(flag);
-        }
+        Collections.addAll(flagSet, flags);
         return flagSet;
     }
 

@@ -1,6 +1,6 @@
 package org.classy;
 
-public class Reference {
+public class SymbolicReference {
 
     public enum ReferenceType {
 
