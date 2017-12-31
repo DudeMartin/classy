@@ -6,6 +6,7 @@ A small, Java bytecode engineering library.
 * Simple. Excessive abstraction is avoided to keep the implementation as straightforward as possible.
 * Easy to use. All the details are handled in the background.
 * Object-based representation. The individual components of class files are represented by objects. 
+* No dependencies other than Java 5.
 
 ## Usage
 To read a `.class` file, you first need to read its contents into a `byte` array. Then, simply construct a `ClassFile` object using that array.
