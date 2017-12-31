@@ -29,13 +29,8 @@ public class StackMapFrame {
     public static final int FULL_FRAME = 255;
 
     public static final Object[] EMPTY = new Object[0];
-
     public int type;
     public Instruction start;
     public Object[] locals;
     public Object[] stack;
-
-    public StackMapFrame() {
-
-    }
 }

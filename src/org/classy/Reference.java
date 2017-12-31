@@ -17,8 +17,4 @@ public class Reference {
     public String name;
     public String descriptor;
     public int kind;
-
-    public Reference() {
-
-    }
 }
