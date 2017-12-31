@@ -4,6 +4,7 @@ class Buffer {
 
     byte[] buffer;
     int offset;
+    private final StringBuilder cachedBuilder = new StringBuilder();
 
     Buffer(byte[] buffer, int offset) {
         this.buffer = buffer;
@@ -11,7 +12,7 @@ class Buffer {
     }
 
     Buffer(int initialCapacity) {
-        this(new byte[initialCapacity], 0);
+        buffer = new byte[initialCapacity];
     }
 
     int getByte() {
@@ -40,22 +41,36 @@ class Buffer {
     }
 
     String getString(int encodedLength) {
-        char[] decoded = new char[encodedLength];
-        int index = 0;
+        cachedBuilder.setLength(0);
+        int currentByte;
+        char partialCharacter = 0;
+        int state = 0;
         while (encodedLength-- > 0) {
-            char c = (char) getUnsignedByte();
-            if (c < 0x80) {
-                decoded[index++] = c;
-            } else if (c < 0xE0 && c > 0xBF) {
-                c &= 0x1F;
-                decoded[index++] = (char) ((c << 6) + (getByte() & 0x3F));
-            } else {
-                c &= 0x0F;
-                c = (char) ((c << 6) + (getByte() & 0x3F));
-                decoded[index++] = (char) ((c << 6) + (getByte() & 0x3F));
+            currentByte = getByte();
+            switch (state) {
+                case 0:
+                    currentByte &= 0xFF;
+                    if (currentByte < 0x80) {
+                        cachedBuilder.append((char) currentByte);
+                    } else if (currentByte < 0xE0 && currentByte > 0xBF) {
+                        partialCharacter = (char) (currentByte & 0x1F);
+                        state = 1;
+                    } else {
+                        partialCharacter = (char) (currentByte & 0xF);
+                        state = 2;
+                    }
+                    break;
+                case 1:
+                    cachedBuilder.append((char) ((partialCharacter << 6) | (currentByte & 0x3F)));
+                    state = 0;
+                    break;
+                case 2:
+                    partialCharacter = (char) ((partialCharacter << 6) | (currentByte & 0x3F));
+                    state = 1;
+                    break;
             }
         }
-        return new String(decoded, 0, index);
+        return cachedBuilder.toString();
     }
 
     byte[] getBytes(int amount) {
