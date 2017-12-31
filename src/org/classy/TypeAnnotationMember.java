@@ -4,43 +4,9 @@ import org.classy.instructions.Instruction;
 
 public class TypeAnnotationMember extends AnnotationMember {
 
-    /*
-     * Type annotation targets.
-     */
-    public static final int CLASS_PARAMETER_GENERIC = 0x00;
-    public static final int METHOD_PARAMETER_GENERIC = 0x01;
-    public static final int CLASS_SUPERTYPE = 0x10;
-    public static final int CLASS_PARAMETER_GENERIC_BOUND = 0x11;
-    public static final int METHOD_PARAMETER_GENERIC_BOUND = 0x12;
-    public static final int FIELD_DECLARATION = 0x13;
-    public static final int METHOD_RETURN = 0x14;
-    public static final int METHOD_RECEIVER = 0x15;
-    public static final int METHOD_FORMAL_PARAMETER = 0x16;
-    public static final int THROWS = 0x17;
-    public static final int LOCAL_VARIABLE = 0x40;
-    public static final int RESOURCE_VARIABLE = 0x41;
-    public static final int EXCEPTION_PARAMETER = 0x42;
-    public static final int INSTANCEOF_EXPRESSION = 0x43;
-    public static final int NEW_EXPRESSION = 0x44;
-    public static final int CONSTRUCTOR_REFERENCE_EXPRESSION = 0x45;
-    public static final int METHOD_REFERENCE_EXPRESSION = 0x46;
-    public static final int CAST_EXPRESSION = 0x47;
-    public static final int CONSTRUCTOR_ARGUMENT_GENERIC = 0x48;
-    public static final int METHOD_ARGUMENT_GENERIC = 0x49;
-    public static final int CONSTRUCTOR_REFERENCE_ARGUMENT_GENERIC = 0x4A;
-    public static final int METHOD_REFERENCE_ARGUMENT_GENERIC = 0x4B;
-
-    /*
-     * Type paths.
-     */
-    public static final int ARRAY_TYPE = 0;
-    public static final int NESTED_TYPE = 1;
-    public static final int WILDCARD_TYPE = 2;
-    public static final int TYPE_ARGUMENT = 3;
-
-    public int type;
+    public TargetType target;
     public TypeInformation information;
-    public int[][] path;
+    public TypePathStep[] path;
 
     public TypeAnnotationMember() {
 
@@ -51,35 +17,54 @@ public class TypeAnnotationMember extends AnnotationMember {
                          ClassFile classFile,
                          MethodMember method,
                          Instruction[] instructions) {
-        type = data.getUnsignedByte();
-        information = (type == FIELD_DECLARATION || type == METHOD_RETURN || type == METHOD_RECEIVER)
-                ? null
-                : new TypeInformation(data, classFile, method, instructions, type);
-        int length = data.getUnsignedByte();
-        path = new int[length][2];
-        for (int i = 0; i < length; i++) {
-            path[i][0] = data.getUnsignedByte();
-            path[i][1] = data.getUnsignedByte();
+        target = TargetType.forValue(data.getUnsignedByte());
+        information = new TypeInformation(data, classFile, method, instructions, target);
+        int pathLength = data.getUnsignedByte();
+        path = new TypePathStep[pathLength];
+        for (int i = 0; i < pathLength; i++) {
+            path[i] = new TypePathStep(data);
         }
         readAnnotation(constantPool, data);
     }
 
-    public static class LocalVariableRange {
+    public enum TargetType {
 
-        public Instruction start;
-        public Instruction end;
-        public int index;
+        CLASS_TYPE_PARAMETER (0x00),
+        METHOD_TYPE_PARAMETER (0x01),
+        CLASS_EXTENDS (0x10),
+        CLASS_TYPE_PARAMETER_BOUND (0x11),
+        METHOD_TYPE_PARAMETER_BOUND (0x12),
+        FIELD (0x13),
+        METHOD_RETURN (0x14),
+        METHOD_RECEIVER (0x15),
+        METHOD_FORMAL_PARAMETER (0x16),
+        THROWS (0x17),
+        LOCAL_VARIABLE (0x40),
+        RESOURCE_VARIABLE (0x41),
+        EXCEPTION_PARAMETER (0x42),
+        INSTANCEOF (0x43),
+        NEW (0x44),
+        CONSTRUCTOR_REFERENCE (0x45),
+        METHOD_REFERENCE (0x46),
+        CAST (0x47),
+        CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT (0x48),
+        METHOD_INVOCATION_TYPE_ARGUMENT (0x49),
+        CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT (0x4A),
+        METHOD_REFERENCE_TYPE_ARGUMENT (0x4B);
 
-        public LocalVariableRange() {
+        public final int typeValue;
 
+        TargetType(int typeValue) {
+            this.typeValue = typeValue;
         }
 
-        private LocalVariableRange(Buffer data, Instruction[] instructions) {
-            int startIndex = data.getUnsignedShort();
-            start = instructions[startIndex];
-            int endIndex = startIndex + data.getUnsignedShort();
-            end = (endIndex >= instructions.length) ? null : instructions[endIndex];
-            index = data.getUnsignedShort();
+        public static TargetType forValue(int typeValue) {
+            for (TargetType type : TargetType.values()) {
+                if (typeValue == type.typeValue) {
+                    return type;
+                }
+            }
+            throw new IllegalArgumentException(typeValue + " is not a valid target type value.");
         }
     }
 
@@ -88,7 +73,7 @@ public class TypeAnnotationMember extends AnnotationMember {
         public int value;
         public int secondValue;
         public String stringValue;
-        @Generated public LocalVariableRange[] localVariableTable;
+        public LocalVariableRange[] localVariableTable;
         public ExceptionHandler exceptionHandler;
         public Instruction instruction;
 
@@ -100,25 +85,25 @@ public class TypeAnnotationMember extends AnnotationMember {
                                 ClassFile classFile,
                                 MethodMember method,
                                 Instruction[] instructions,
-                                int type) {
+                                TargetType target) {
             int value = 0;
             int secondValue = 0;
             String stringValue = null;
             LocalVariableRange[] localVariableTable = null;
             ExceptionHandler exceptionHandler = null;
             Instruction instruction = null;
-            switch (type) {
-                case CLASS_PARAMETER_GENERIC:
-                case METHOD_PARAMETER_GENERIC:
+            switch (target) {
+                case CLASS_TYPE_PARAMETER:
+                case METHOD_TYPE_PARAMETER:
                 case METHOD_FORMAL_PARAMETER:
                     value = data.getUnsignedByte();
                     break;
-                case CLASS_SUPERTYPE:
+                case CLASS_EXTENDS:
                     int supertypeIndex = data.getUnsignedShort();
                     stringValue = (supertypeIndex == 65535) ? classFile.superclassName : classFile.interfaceNames.get(supertypeIndex);
                     break;
-                case CLASS_PARAMETER_GENERIC_BOUND:
-                case METHOD_PARAMETER_GENERIC_BOUND:
+                case CLASS_TYPE_PARAMETER_BOUND:
+                case METHOD_TYPE_PARAMETER_BOUND:
                     value = data.getUnsignedByte();
                     secondValue = data.getUnsignedByte();
                     break;
@@ -136,17 +121,17 @@ public class TypeAnnotationMember extends AnnotationMember {
                 case EXCEPTION_PARAMETER:
                     exceptionHandler = method.exceptionHandlers.get(data.getUnsignedShort());
                     break;
-                case INSTANCEOF_EXPRESSION:
-                case NEW_EXPRESSION:
-                case CONSTRUCTOR_REFERENCE_EXPRESSION:
-                case METHOD_REFERENCE_EXPRESSION:
+                case INSTANCEOF:
+                case NEW:
+                case CONSTRUCTOR_REFERENCE:
+                case METHOD_REFERENCE:
                     instruction = instructions[data.getUnsignedShort()];
                     break;
-                case CAST_EXPRESSION:
-                case CONSTRUCTOR_ARGUMENT_GENERIC:
-                case METHOD_ARGUMENT_GENERIC:
-                case CONSTRUCTOR_REFERENCE_ARGUMENT_GENERIC:
-                case METHOD_REFERENCE_ARGUMENT_GENERIC:
+                case CAST:
+                case CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT:
+                case METHOD_INVOCATION_TYPE_ARGUMENT:
+                case CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT:
+                case METHOD_REFERENCE_TYPE_ARGUMENT:
                     instruction = instructions[data.getUnsignedShort()];
                     value = data.getUnsignedByte();
                     break;
@@ -157,6 +142,61 @@ public class TypeAnnotationMember extends AnnotationMember {
             this.localVariableTable = localVariableTable;
             this.exceptionHandler = exceptionHandler;
             this.instruction = instruction;
+        }
+
+        public static class LocalVariableRange {
+
+            public Instruction start;
+            public Instruction end;
+            public int index;
+
+            public LocalVariableRange() {
+
+            }
+
+            private LocalVariableRange(Buffer data, Instruction[] instructions) {
+                int startIndex = data.getUnsignedShort();
+                start = instructions[startIndex];
+                int endIndex = startIndex + data.getUnsignedShort();
+                end = (endIndex >= instructions.length) ? null : instructions[endIndex];
+                index = data.getUnsignedShort();
+            }
+        }
+    }
+
+    public static class TypePathStep {
+
+        public TypePathKind pathKind;
+        public int argumentIndex;
+
+        public TypePathStep() {
+
+        }
+
+        private TypePathStep(Buffer data) {
+            pathKind = TypePathKind.forValue(data.getUnsignedByte());
+            argumentIndex = data.getUnsignedByte();
+        }
+
+        public enum TypePathKind {
+
+            ARRAY (0),
+            INNER_TYPE (1),
+            WILDCARD (2),
+            TYPE_ARGUMENT (3);
+
+            public final int kindValue;
+
+            TypePathKind(int kindValue) {
+                this.kindValue = kindValue;
+            }
+
+            public static TypePathKind forValue(int kindValue) {
+                if (kindValue < 0 || kindValue > 3) {
+                    throw new IllegalArgumentException(kindValue + " is not a valid type path kind value.");
+                }
+                return TypePathKind.values()[kindValue];
+            }
         }
     }
 }
