@@ -37,7 +37,7 @@ public class MethodMember extends ClassMember {
     public List<String> exceptions;
     public List<List<AnnotationMember>> visibleParameterAnnotations;
     public List<List<AnnotationMember>> invisibleParameterAnnotations;
-    public AnnotationMember.ElementValue defaultAnnotationValue;
+    public AnnotationMember.ElementPair.ElementValue defaultAnnotationValue;
     public List<MethodParameter> parameters;
 
     public MethodMember() {
@@ -75,7 +75,7 @@ public class MethodMember extends ClassMember {
                 invisibleParameterAnnotations.add(Shared.readAnnotations(constantPool, data));
             }
         } else if ("AnnotationDefault".equals(name)) {
-            defaultAnnotationValue = new AnnotationMember.ElementValue(constantPool, data);
+            defaultAnnotationValue = new AnnotationMember.ElementPair.ElementValue(constantPool, data);
         } else if ("MethodParameters".equals(name)) {
             int count = data.getUnsignedByte();
             parameters = new ArrayList<MethodParameter>(count);
