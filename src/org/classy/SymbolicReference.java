@@ -2,7 +2,7 @@ package org.classy;
 
 public class SymbolicReference {
 
-    public enum ReferenceType {
+    public enum Type {
 
         CLASS,
         FIELD,
@@ -12,7 +12,7 @@ public class SymbolicReference {
         TYPE
     }
 
-    public ReferenceType type;
+    public Type type;
     public String owner;
     public String name;
     public String descriptor;

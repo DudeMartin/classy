@@ -1,10 +1,10 @@
 package org.classy;
 
-import org.classy.SymbolicReference.ReferenceType;
-import org.classy.instructions.Instruction;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.classy.SymbolicReference.Type;
+import org.classy.instructions.Instruction;
 
 class Shared {
 
@@ -47,7 +47,7 @@ class Shared {
                 return constantPool[item.value].stringValue;
             case PoolItem.CONSTANT_Class:
                 SymbolicReference classReference = new SymbolicReference();
-                classReference.type = ReferenceType.CLASS;
+                classReference.type = Type.CLASS;
                 classReference.name = constantPool[item.value].stringValue;
                 return classReference;
             case PoolItem.CONSTANT_Fieldref:
@@ -56,13 +56,13 @@ class Shared {
                 SymbolicReference methodReference = new SymbolicReference();
                 switch (item.tag) {
                     case PoolItem.CONSTANT_Fieldref:
-                        methodReference.type = ReferenceType.FIELD;
+                        methodReference.type = Type.FIELD;
                         break;
                     case PoolItem.CONSTANT_Methodref:
-                        methodReference.type = ReferenceType.METHOD;
+                        methodReference.type = Type.METHOD;
                         break;
                     default:
-                        methodReference.type = ReferenceType.INTERFACE_METHOD;
+                        methodReference.type = Type.INTERFACE_METHOD;
                         break;
                 }
                 methodReference.owner = constantPool[constantPool[item.value].value].stringValue;
@@ -72,7 +72,7 @@ class Shared {
             }
             case PoolItem.CONSTANT_MethodHandle:
                 SymbolicReference handleReference = new SymbolicReference();
-                handleReference.type = ReferenceType.HANDLE;
+                handleReference.type = Type.HANDLE;
                 handleReference.owner = constantPool[constantPool[constantPool[(int) item.longValue].value].value].stringValue;
                 handleReference.name = constantPool[constantPool[(int) constantPool[(int) item.longValue].longValue].value].stringValue;
                 handleReference.descriptor = constantPool[(int) constantPool[(int) constantPool[(int) item.longValue].longValue].longValue].stringValue;
@@ -80,7 +80,7 @@ class Shared {
                 return handleReference;
             case PoolItem.CONSTANT_MethodType:
                 SymbolicReference typeReference = new SymbolicReference();
-                typeReference.type = ReferenceType.TYPE;
+                typeReference.type = Type.TYPE;
                 typeReference.descriptor = constantPool[item.value].stringValue;
                 return typeReference;
         }

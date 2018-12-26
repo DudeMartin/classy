@@ -10,7 +10,7 @@ public class ConstantPushInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.CONSTANT_PUSH;
+    public Type getType() {
+        return Type.CONSTANT_PUSH;
     }
 }

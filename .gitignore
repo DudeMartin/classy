@@ -2,3 +2,4 @@
 *.iml
 *.class
 *.jar
+.DS_STORE

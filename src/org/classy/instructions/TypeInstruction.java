@@ -22,7 +22,7 @@ public class TypeInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.TYPE;
+    public Type getType() {
+        return Type.TYPE;
     }
 }

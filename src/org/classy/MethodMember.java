@@ -1,5 +1,11 @@
 package org.classy;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.classy.instructions.ConstantPushInstruction;
 import org.classy.instructions.DynamicMethodInstruction;
 import org.classy.instructions.FieldInstruction;
@@ -14,12 +20,6 @@ import org.classy.instructions.PushInstruction;
 import org.classy.instructions.TableSwitchInstruction;
 import org.classy.instructions.TypeInstruction;
 import org.classy.instructions.VariableInstruction;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class MethodMember extends ClassMember {
 

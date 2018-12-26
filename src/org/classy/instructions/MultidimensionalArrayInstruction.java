@@ -10,7 +10,7 @@ public class MultidimensionalArrayInstruction extends TypeInstruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.MULTIDIMENSIONAL_ARRAY;
+    public Type getType() {
+        return Type.MULTIDIMENSIONAL_ARRAY;
     }
 }

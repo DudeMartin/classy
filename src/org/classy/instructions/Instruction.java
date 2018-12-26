@@ -1,30 +1,30 @@
 package org.classy.instructions;
 
+import static org.classy.instructions.Instruction.Type.CONSTANT_PUSH;
+import static org.classy.instructions.Instruction.Type.DYNAMIC_METHOD;
+import static org.classy.instructions.Instruction.Type.FIELD;
+import static org.classy.instructions.Instruction.Type.INCREMENT;
+import static org.classy.instructions.Instruction.Type.JUMP;
+import static org.classy.instructions.Instruction.Type.LOOKUP_SWITCH;
+import static org.classy.instructions.Instruction.Type.METHOD;
+import static org.classy.instructions.Instruction.Type.MULTIDIMENSIONAL_ARRAY;
+import static org.classy.instructions.Instruction.Type.NULLARY;
+import static org.classy.instructions.Instruction.Type.PUSH;
+import static org.classy.instructions.Instruction.Type.RESERVED;
+import static org.classy.instructions.Instruction.Type.TABLE_SWITCH;
+import static org.classy.instructions.Instruction.Type.TYPE;
+import static org.classy.instructions.Instruction.Type.VARIABLE;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.classy.instructions.Instruction.InstructionType.CONSTANT_PUSH;
-import static org.classy.instructions.Instruction.InstructionType.DYNAMIC_METHOD;
-import static org.classy.instructions.Instruction.InstructionType.FIELD;
-import static org.classy.instructions.Instruction.InstructionType.INCREMENT;
-import static org.classy.instructions.Instruction.InstructionType.JUMP;
-import static org.classy.instructions.Instruction.InstructionType.LOOKUP_SWITCH;
-import static org.classy.instructions.Instruction.InstructionType.METHOD;
-import static org.classy.instructions.Instruction.InstructionType.MULTIDIMENSIONAL_ARRAY;
-import static org.classy.instructions.Instruction.InstructionType.NULLARY;
-import static org.classy.instructions.Instruction.InstructionType.PUSH;
-import static org.classy.instructions.Instruction.InstructionType.RESERVED;
-import static org.classy.instructions.Instruction.InstructionType.TABLE_SWITCH;
-import static org.classy.instructions.Instruction.InstructionType.TYPE;
-import static org.classy.instructions.Instruction.InstructionType.VARIABLE;
 
 public abstract class Instruction {
 
     /**
      * Represents an instruction type.
      */
-    public enum InstructionType {
+    public enum Type {
 
         /**
          * A zero operand instruction.
@@ -317,7 +317,7 @@ public abstract class Instruction {
     public static final int IMPDEP1         = 0xFE;
     public static final int IMPDEP2         = 0xFF;
 
-    public static final List<InstructionType> TYPES = Collections.unmodifiableList(Arrays.asList(
+    public static final List<Type> TYPES = Collections.unmodifiableList(Arrays.asList(
             NULLARY,
             NULLARY,
             NULLARY,
@@ -514,7 +514,7 @@ public abstract class Instruction {
             TYPE,
             NULLARY,
             NULLARY,
-            InstructionType.WIDE,
+            Type.WIDE,
             MULTIDIMENSIONAL_ARRAY,
             JUMP,
             JUMP,
@@ -593,5 +593,5 @@ public abstract class Instruction {
         return opcode;
     }
 
-    public abstract InstructionType getType();
+    public abstract Type getType();
 }

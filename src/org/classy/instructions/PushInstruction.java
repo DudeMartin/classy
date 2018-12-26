@@ -10,7 +10,7 @@ public class PushInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.PUSH;
+    public Type getType() {
+        return Type.PUSH;
     }
 }

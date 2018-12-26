@@ -12,7 +12,7 @@ public class FieldInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.FIELD;
+    public Type getType() {
+        return Type.FIELD;
     }
 }

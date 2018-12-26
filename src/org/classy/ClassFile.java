@@ -86,7 +86,7 @@ public class ClassFile {
                 }
             } else if ("EnclosingMethod".equals(attributeName)) {
                 enclosingMethod = new SymbolicReference();
-                enclosingMethod.type = SymbolicReference.ReferenceType.METHOD;
+                enclosingMethod.type = SymbolicReference.Type.METHOD;
                 enclosingMethod.owner = constantPool[constantPool[data.getUnsignedShort()].value].stringValue;
                 int methodIndex = data.getUnsignedShort();
                 if (methodIndex != 0) {

@@ -18,7 +18,7 @@ public class TableSwitchInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.TABLE_SWITCH;
+    public Type getType() {
+        return Type.TABLE_SWITCH;
     }
 }

@@ -10,7 +10,7 @@ public class VariableInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.VARIABLE;
+    public Type getType() {
+        return Type.VARIABLE;
     }
 }

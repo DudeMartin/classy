@@ -16,7 +16,7 @@ public class DynamicMethodInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.DYNAMIC_METHOD;
+    public Type getType() {
+        return Type.DYNAMIC_METHOD;
     }
 }

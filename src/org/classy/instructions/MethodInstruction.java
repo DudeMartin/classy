@@ -12,7 +12,7 @@ public class MethodInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.METHOD;
+    public Type getType() {
+        return Type.METHOD;
     }
 }

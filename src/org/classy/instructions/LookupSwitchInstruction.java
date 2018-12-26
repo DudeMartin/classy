@@ -14,7 +14,7 @@ public class LookupSwitchInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.LOOKUP_SWITCH;
+    public Type getType() {
+        return Type.LOOKUP_SWITCH;
     }
 }

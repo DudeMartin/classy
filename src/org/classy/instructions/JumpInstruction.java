@@ -18,7 +18,7 @@ public class JumpInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.JUMP;
+    public Type getType() {
+        return Type.JUMP;
     }
 }

@@ -7,7 +7,7 @@ public class NullaryInstruction extends Instruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.NULLARY;
+    public Type getType() {
+        return Type.NULLARY;
     }
 }

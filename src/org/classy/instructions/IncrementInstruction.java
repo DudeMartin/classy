@@ -10,7 +10,7 @@ public class IncrementInstruction extends VariableInstruction {
     }
 
     @Override
-    public InstructionType getType() {
-        return InstructionType.INCREMENT;
+    public Type getType() {
+        return Type.INCREMENT;
     }
 }
