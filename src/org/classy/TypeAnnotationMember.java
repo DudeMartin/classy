@@ -1,5 +1,9 @@
 package org.classy;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.classy.instructions.Instruction;
 
 public class TypeAnnotationMember extends AnnotationMember {
@@ -52,6 +56,7 @@ public class TypeAnnotationMember extends AnnotationMember {
         CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT(0x4A),
         METHOD_REFERENCE_TYPE_ARGUMENT(0x4B);
 
+        private static final Set<TargetType> VALUES = Collections.unmodifiableSet(EnumSet.allOf(TargetType.class));
         public final int tag;
 
         TargetType(int tag) {
@@ -59,7 +64,7 @@ public class TypeAnnotationMember extends AnnotationMember {
         }
 
         public static TargetType forTag(int tag) {
-            for (TargetType type : TargetType.values()) {
+            for (TargetType type : VALUES) {
                 if (tag == type.tag) {
                     return type;
                 }
@@ -185,6 +190,7 @@ public class TypeAnnotationMember extends AnnotationMember {
             WILDCARD(2),
             TYPE_ARGUMENT(3);
 
+            private static final Set<Kind> VALUES = Collections.unmodifiableSet(EnumSet.allOf(Kind.class));
             public final int tag;
 
             Kind(int tag) {
@@ -192,10 +198,12 @@ public class TypeAnnotationMember extends AnnotationMember {
             }
 
             public static Kind forTag(int tag) {
-                if (tag < 0 || tag > 3) {
-                    throw new IllegalArgumentException(tag + " is not a valid path step kind tag.");
+                for (Kind kind : VALUES) {
+                    if (kind.tag == tag) {
+                        return kind;
+                    }
                 }
-                return Kind.values()[tag];
+                throw new IllegalArgumentException(tag + " is not a valid path step kind tag.");
             }
         }
     }
